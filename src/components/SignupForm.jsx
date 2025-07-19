@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Button from "./button";
+import Button from "./Button";
 import InputField from "./InputField";
 import axiosOtpInstance from "../utils/axiosOtpInstance";
 import axiosAuthInstance from "../utils/axiosAuthInstance";

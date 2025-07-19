@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import BurgerMenu from "./BurgerMenu";
-import Button from "./button";
+import Button from "./Button";
 import { useAuth } from "../context/AuthContext";
 import Dropdown from "./Dropdown";
 import { useEffect } from "react";
