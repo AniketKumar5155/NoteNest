@@ -1,6 +1,6 @@
 import Header from "../components/Header"
 import ToolBar from "../components/ToolBar"
-import Main from "../components/main"
+import Main from "../components/Main"
 
 const Homepage = () => {
   return (
