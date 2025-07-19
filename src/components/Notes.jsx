@@ -14,21 +14,21 @@ const Notes = () => {
   const [loading, setLoading] = useState(false)
 
   const getNoteById = async () => {
-    try{
+    try {
       const noteData = await getNoteByIdService(id);
       setTitle(noteData.title);
       setContent(noteData.content);
-    } catch(error){
+    } catch (error) {
       toast.error("Ek note nahi fetch ho paa raha hain")
     }
   }
-  useEffect(()=>{
-    if (id){
+  useEffect(() => {
+    if (id) {
       getNoteById();
     }
   }, [])
 
-   const handleSave = async () => {
+  const handleSave = async () => {
     if (!title.trim()) {
       toast.error("Title is required");
       return;
@@ -36,8 +36,8 @@ const Notes = () => {
 
     setLoading(true);
     try {
-      if (id){
-        const noteData = await updateNoteService(id,  { title, content });
+      if (id) {
+        const noteData = await updateNoteService(id, { title, content });
         setTitle(noteData.title);
         setContent(noteData.content);
         toast.success("Note saved");
@@ -67,7 +67,18 @@ const Notes = () => {
           <input type="text" name="title" placeholder="Title" className="w-full wrap bg-amber-100 h-7 focus:outline-none focus:ring-0 focus:border-none " value={title} onChange={(e) => setTitle(e.target.value)} />
           <div className="flex gap-2">
             <div><RiArrowGoBackFill className="text-yellow-500 h-7 w-7" /></div>
-            <div> <FaSave className={`h-7 w-7 cursor-pointer ${ title.trim() ? "text-green-500" : "text-gray-400" }`} onClick={ handleSave } disabled={ !title.trim() || loading } /> </div>
+            <FaSave
+              className={`h-7 w-7 cursor-pointer 
+              ${title.trim() ? "text-green-500" : "text-gray-400"} 
+              ${loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
+              onClick={async () => {
+                if (loading || !title.trim()) return;
+                setLoading(true);
+                await handleSave();
+              }}
+
+            />
+
           </div>
         </div>
         <hr />
