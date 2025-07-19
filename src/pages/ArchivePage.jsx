@@ -1,5 +1,5 @@
 import React from 'react'
-import Main from '../components/main'
+import Main from '../components/Main'
 import ToolBar from '../components/ToolBar'
 
 const ArchivePage = () => {
