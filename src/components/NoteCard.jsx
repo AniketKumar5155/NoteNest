@@ -5,10 +5,17 @@ import { toast } from "react-toastify";
 import { useState } from "react";
 
 const NoteCard = ({ id, title }) => {
-  const { softDeleteNote, deleteNote, restoreDeletedNote, unarchiveNote, archiveNote } = useNotes();
+  const {
+    softDeleteNote,
+    deleteNote,
+    restoreDeletedNote,
+    unarchiveNote,
+    archiveNote,
+  } = useNotes();
   const location = useLocation();
 
   const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const noteStatus = () => {
     if (location.pathname.includes("bin")) return "deleted";
@@ -19,6 +26,8 @@ const NoteCard = ({ id, title }) => {
   const status = noteStatus();
 
   const handleDelete = async () => {
+    if (loading) return;
+    setLoading(true);
     try {
       if (status === "active" || status === "archived") {
         await softDeleteNote(id);
@@ -31,30 +40,42 @@ const NoteCard = ({ id, title }) => {
     } catch (error) {
       console.error("Error deleting note:", error);
       toast.error("Something went wrong while deleting");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleRestore = async () => {
+    if (loading) return;
+    setLoading(true);
     try {
       await restoreDeletedNote(id);
       toast.success("Note restored successfully");
     } catch (error) {
       console.error("Error restoring note:", error);
       toast.error("Failed to restore note");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleUnarchive = async () => {
+    if (loading) return;
+    setLoading(true);
     try {
       await unarchiveNote(id);
       toast.success("Note unarchived successfully");
     } catch (error) {
       console.error("Error unarchiving note:", error);
       toast.error("Failed to unarchive note");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleArchive = async () => {
+    if (loading) return;
+    setLoading(true);
     try {
       await archiveNote(id);
       toast.success("Note archived successfully");
@@ -64,7 +85,7 @@ const NoteCard = ({ id, title }) => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   return (
     <div className="relative flex justify-between items-center p-4 bg-amber-300 rounded shadow mx-5 hover:bg-amber-400 transition-colors">
@@ -76,38 +97,46 @@ const NoteCard = ({ id, title }) => {
 
       {status === "deleted" && (
         <MdRestore
-          onClick={handleRestore}
-          className="text-green-600 hover:text-green-700 cursor-pointer text-xl ml-4"
+          onClick={!loading ? handleRestore : undefined}
+          className={`text-green-600 hover:text-green-700 cursor-pointer text-xl ml-4 ${
+            loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+          }`}
           title="Restore Note"
         />
       )}
 
       {status === "archived" && (
         <MdUnarchive
-          onClick={handleUnarchive}
-          className="text-blue-600 hover:text-blue-700 cursor-pointer text-xl ml-4"
+          onClick={!loading ? handleUnarchive : undefined}
+          className={`text-blue-600 hover:text-blue-700 cursor-pointer text-xl ml-4 ${
+            loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+          }`}
           title="Unarchive Note"
         />
       )}
 
       {status === "active" && (
         <MdArchive
-          onClick={handleArchive}
-          className="text-blue-600 hover:text-blue-700 cursor-pointer text-xl ml-4"
-          title="Unarchive Note"
+          onClick={!loading ? handleArchive : undefined}
+          className={`text-blue-600 hover:text-blue-700 cursor-pointer text-xl ml-4 ${
+            loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+          }`}
+          title="Archive Note"
         />
       )}
 
-
       <MdDelete
         onClick={() => {
+          if (loading) return;
           if (status === "deleted") {
             setConfirmingDeleteId(id);
           } else {
             handleDelete();
           }
         }}
-        className="text-red-500 hover:text-red-600 cursor-pointer text-xl ml-4"
+        className={`text-red-500 hover:text-red-600 cursor-pointer text-xl ml-4 ${
+          loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
+        }`}
         title={status === "deleted" ? "Permanently Delete" : "Move to Bin"}
       />
 
@@ -116,18 +145,19 @@ const NoteCard = ({ id, title }) => {
           <p className="text-sm text-gray-800 font-medium mb-2">
             Permanently delete this note?
             <div>Title: {title}</div>
-
           </p>
           <div className="flex justify-end gap-2">
             <button
               onClick={() => setConfirmingDeleteId(null)}
               className="text-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
+              disabled={loading}
             >
               Cancel
             </button>
             <button
               onClick={handleDelete}
               className="text-sm px-3 py-1 bg-red-500 text-white hover:bg-red-600 rounded"
+              disabled={loading}
             >
               Delete
             </button>

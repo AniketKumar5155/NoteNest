@@ -11,4 +11,5 @@ const Bin = () => {
   )
 }
 
-export default Bin
+export default Bin 
+
