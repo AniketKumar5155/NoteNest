@@ -1,26 +1,25 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Button from "./Button";
 import InputField from "./InputField";
-import axiosOtpInstance from "../utils/axiosOtpInstance";
-import axiosAuthInstance from "../utils/axiosAuthInstance";
 import { signupSchema } from "../shared/schemas/authSchemas";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
 
 const SignupForm = () => {
-  const { signup } = useAuth();
+  const { signup, getOtp, verifyOtp, token, isLoading } = useAuth();
   const navigate = useNavigate();
 
   const [sentOtp, setSentOtp] = useState(false);
+  const [otpLoading, setOtpLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    first_name: "Aniket",
-    last_name: "Kumar",
-    username: "Aniketkr@",
-    email: "aniketkumar5155@gmail.com",
-    password: "Aniketkr@5155",
-    confirm_password: "Aniketkr@5155",
+    first_name: "",
+    last_name: "",
+    username: "",
+    email: "",
+    password: "",
+    confirm_password: "",
     otp: "",
   });
 
@@ -28,54 +27,54 @@ const SignupForm = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const getOtp = async () => {
-    try {
-      const { email } = formData;
-      if (!email) {
-        toast.error("Please enter your email to receive OTP");
-        return;
-      }
+  const isValidOtp = (otp) => /^\d{6}$/.test(otp);
 
-      const res = await axiosOtpInstance.post("/get-otp", { email });
-      toast.success(res.data.message || "OTP sent successfully");
+  const handleGetOtp = async () => {
+    const { email } = formData;
+    if (!email) {
+      toast.error("Please enter your email to receive OTP");
+      return;
+    }
+
+    try {
+      setOtpLoading(true);
+      await getOtp(email);
+      toast.success("OTP sent successfully");
       setSentOtp(true);
     } catch (err) {
-      toast.error(err.response?.data?.message || "Failed to send OTP");
+      toast.error("Failed to send OTP");
+    } finally {
+      setOtpLoading(false);
     }
   };
 
   const handleSignup = async (e) => {
-  e.preventDefault();
+    e.preventDefault();
 
+    try {
+      const validated = signupSchema.parse(formData);
 
-  try {
-    const validatedData = signupSchema.parse(formData);
+      if (!isValidOtp(validated.otp)) {
+        toast.error("Enter a valid 6-digit numeric OTP");
+        return;
+      }
 
-    const { email, otp } = formData;
+      await verifyOtp(validated.email, validated.otp);
+      await signup(validated);
 
-    if (!otp || otp.length !== 6) {
-      toast.error("Enter the 6-digit OTP before signing up.");
-      return;
+      toast.success("Signup successful");
+    } catch (err) {
+      if (err.name === "ZodError") {
+        err.errors.forEach((e) => toast.error(e.message));
+      } else {
+        toast.error("Signup failed");
+      }
     }
+  };
 
-    const verifyRes = await axiosOtpInstance.post("/verify-otp", { email, otp });
-    toast.success(verifyRes.data?.message || "OTP verified");
-
-    const res = await axiosAuthInstance.post("/signup", validatedData);
-    const { accessToken, user } = res.data;
-
-    signup(user, accessToken); 
-    toast.success("Signup successful");
-    navigate("/", { replace: true });
-  } catch (err) {
-    if (err.name === "ZodError") {
-      err.errors.forEach((e) => toast.error(e.message));
-    } else {
-      toast.error(err.response?.data?.message || "Signup failed");
-    }
-  }
-};
-
+  useEffect(() => {
+    if (token) navigate("/");
+  }, [token, navigate]);
 
   return (
     <div className="flex flex-col justify-center items-center min-h-screen bg-gray-100 overflow-hidden">
@@ -105,10 +104,11 @@ const SignupForm = () => {
           />
           {!sentOtp ? (
             <Button
-              label="Get OTP"
+              label={otpLoading ? "Sending..." : "Get OTP"}
               type="button"
-              onClick={getOtp}
+              onClick={handleGetOtp}
               className="px-4 py-2 text-xs bg-amber-400 hover:bg-amber-500 rounded-md text-white font-medium transition-colors mt-2"
+              disabled={otpLoading}
             />
           ) : (
             <p className="text-green-600 text-sm mt-2">📨 OTP Sent</p>
@@ -116,12 +116,13 @@ const SignupForm = () => {
         </div>
 
         <Button
-          label="Sign Up"
+          label={isLoading ? "Signing up..." : "Sign Up"}
           type="submit"
-          disabled={!sentOtp}
+          disabled={!sentOtp || isLoading}
           title={!sentOtp ? "Please get OTP first" : ""}
-          className={`w-full px-4 py-2 rounded-md text-white font-medium transition-colors mt-2 flex justify-center ${sentOtp ? "bg-amber-400 hover:bg-amber-500" : "bg-gray-400 cursor-not-allowed"
-            }`}
+          className={`w-full px-4 py-2 rounded-md text-white font-medium transition-colors mt-2 flex justify-center ${
+            sentOtp && !isLoading ? "bg-amber-400 hover:bg-amber-500" : "bg-gray-400 cursor-not-allowed"
+          }`}
         />
       </form>
 
