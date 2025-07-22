@@ -75,6 +75,7 @@ const Notes = () => {
                 if (loading || !title.trim()) return;
                 setLoading(true);
                 await handleSave();
+                setLoading(false);
               }}
 
             />

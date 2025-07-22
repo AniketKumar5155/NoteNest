@@ -2,18 +2,23 @@ import axiosAuthInstance from "../utils/axiosAuthInstance";
 import axiosOtpInstance from "../utils/axiosOtpInstance";
 
 export const getOtpService = async (email) => {
-  return await axiosOtpInstance.post("/get-otp", { email });
+  const res = await axiosOtpInstance.post("/get-otp", { email });
+  return res.data;
 };
 
 export const signupService = async (formData) => {
-  return await axiosAuthInstance.post("/signup", formData);
+  const res = await axiosAuthInstance.post("/signup", formData);
+  return res.data;
 };
 
 export const loginService = async (formData) => {
-    return await axiosAuthInstance.post('/login', formData)
+    const res = await axiosAuthInstance.post('/login', formData)
+    console.log("Login service response:", res.data);
+    return res.data;
 }
 
 export const verifyOtpService = async (email, otp) => {
-  return await axiosOtpInstance.post("/verify-otp", { email, otp });
+  const res = await axiosOtpInstance.post("/verify-otp", { email, otp });
+  return res.data;
 };
 
