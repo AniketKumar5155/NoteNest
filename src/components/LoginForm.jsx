@@ -5,7 +5,6 @@ import InputField from "./InputField";
 import { loginSchema } from "../shared/schemas/authSchemas";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
-import { loginService } from "../service/authService";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -22,12 +21,11 @@ const LoginForm = () => {
     e.preventDefault();
     try {
       const validated = loginSchema.parse(formData);
-      const { accessToken, user  } = await loginService(validated);
-      login(user, accessToken);
+      await login(validated);
       toast.success("Logged in successfully");
       navigate("/", { replace: true });
     } catch (err) {
-      if (err.name === "ZodError") {
+      if (err.name === "ZodError") { 
         err.errors.forEach((e) => toast.error(e.message));
       } else {
         toast.error(err.response?.data?.message || "Login failed");
