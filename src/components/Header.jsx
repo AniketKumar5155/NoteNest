@@ -25,7 +25,7 @@ const Header = () => {
         value: "logout",
         onClick: () => {
           logout();                          // 1. Clears auth context
-          toast.success("Logged out successfully");  // 2. Toast message
+          toast.success("You have been logged out successfully.");
           navigate("/login");               // 3. Redirect to login
         },
       }

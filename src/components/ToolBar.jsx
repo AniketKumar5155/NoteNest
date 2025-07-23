@@ -17,8 +17,8 @@ const ToolBar = ({ page, category }) => {
         newSort?.direction === "up"
           ? "ASC"
           : newSort?.direction === "down"
-          ? "DESC"
-          : undefined,
+            ? "DESC"
+            : undefined,
       category,
     });
   };
@@ -41,8 +41,6 @@ const ToolBar = ({ page, category }) => {
               { label: "Created At", value: "created_at" },
               { label: "Updated At", value: "updated_at" },
               { label: "Title", value: "title" },
-              { label: "A-Z", value: "az" },
-              { label: "Z-A", value: "za" },
             ]}
             enableFilterSort={true}
           />
@@ -51,6 +49,7 @@ const ToolBar = ({ page, category }) => {
           <Dropdown
             trigger={<Filter />}
             options={[
+              { label: "status", isLabel: true },
               { label: "deleted", value: "deleted" },
               { label: "archived", value: "archived" },
               { label: "category", isLabel: true },
