@@ -46,7 +46,7 @@ const Notes = () => {
         const newNote = await createNoteService({ title, content });
         const newId = newNote.id;
         navigate(`/note/${newId}`)
-        toast.success("Note created successfully.");
+        toast.success("Note created successfully..");
       }
     } catch (error) {
       toast.error("An error occurred while saving the note. Please try again.");
