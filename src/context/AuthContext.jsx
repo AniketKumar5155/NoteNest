@@ -24,7 +24,7 @@ export const AuthProvider = ({ children }) => {
         const parsedUser = JSON.parse(user);
         setAuth({ accessToken: token, user: parsedUser });
       } catch (err) {
-        // Optionally log to a monitoring service if needed
+        console.error("❌ Failed to parse user from localStorage", err);
         logout(); // fallback if localStorage is corrupted
       }
     }
@@ -47,7 +47,7 @@ export const AuthProvider = ({ children }) => {
     setAuth({ user, accessToken });
     localStorage.setItem("accessToken", accessToken);
     localStorage.setItem("user", JSON.stringify(user));
-    // Removed debug log
+    console.log(accessToken)
     return data;
   };
 

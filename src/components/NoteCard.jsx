@@ -31,15 +31,15 @@ const NoteCard = ({ id, title }) => {
     try {
       if (status === "active" || status === "archived") {
         await softDeleteNote(id);
-        toast.success("Note has been moved to the bin.");
+        toast.success("Note moved to Bin");
       } else if (status === "deleted") {
         await deleteNote(id);
-        toast.success("Note has been permanently deleted.");
+        toast.success("Note permanently deleted");
         setConfirmingDeleteId(null);
       }
     } catch (error) {
-      // Optionally log to a monitoring service if needed
-      toast.error("Unable to delete note. Please try again.");
+      console.error("Error deleting note:", error);
+      toast.error("Something went wrong while deleting");
     } finally {
       setLoading(false);
     }
@@ -50,10 +50,10 @@ const NoteCard = ({ id, title }) => {
     setLoading(true);
     try {
       await restoreDeletedNote(id);
-      toast.success("Note has been restored successfully.");
+      toast.success("Note restored successfully");
     } catch (error) {
-      // Optionally log to a monitoring service if needed
-      toast.error("Unable to restore note. Please try again.");
+      console.error("Error restoring note:", error);
+      toast.error("Failed to restore note");
     } finally {
       setLoading(false);
     }
@@ -64,10 +64,10 @@ const NoteCard = ({ id, title }) => {
     setLoading(true);
     try {
       await unarchiveNote(id);
-      toast.success("Note has been unarchived successfully.");
+      toast.success("Note unarchived successfully");
     } catch (error) {
-      // Optionally log to a monitoring service if needed
-      toast.error("Unable to unarchive note. Please try again.");
+      console.error("Error unarchiving note:", error);
+      toast.error("Failed to unarchive note");
     } finally {
       setLoading(false);
     }
@@ -78,10 +78,10 @@ const NoteCard = ({ id, title }) => {
     setLoading(true);
     try {
       await archiveNote(id);
-      toast.success("Note has been archived successfully.");
+      toast.success("Note archived successfully");
     } catch (error) {
-      // Optionally log to a monitoring service if needed
-      toast.error("Unable to archive note. Please try again.");
+      console.error("Error archiving note:", error);
+      toast.error("Failed to archive note");
     } finally {
       setLoading(false);
     }

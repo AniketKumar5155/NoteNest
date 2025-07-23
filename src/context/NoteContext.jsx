@@ -30,7 +30,7 @@ export const NoteProvider = ({ children }) => {
             const data = await getAllNotesService();
             setNotes(data);
         } catch (err) {
-            toast.error("Unable to load notes. Please try again.");
+            toast.error("Failed to load notes");
         } finally {
             setLoading(false);
         }
@@ -42,7 +42,7 @@ export const NoteProvider = ({ children }) => {
             await createNoteService({ title, content });
             fetchNotes();
         } catch (err) {
-            toast.error("Unable to create note. Please try again.");
+            toast.error("Failed to create note");
         }
     };
 
@@ -52,7 +52,7 @@ export const NoteProvider = ({ children }) => {
             await updateNoteService(id, updatedData);
             fetchNotes();
         } catch (err) {
-            toast.error("Unable to update note. Please try again.");
+            toast.error("Failed to update note");
         }
     };
 
@@ -60,7 +60,7 @@ export const NoteProvider = ({ children }) => {
         try {
             return await getNoteByIdService(id);
         } catch (err) {
-            toast.error("Unable to retrieve note. Please try again.");
+            toast.error("Failed to get note");
         }
     };
 
@@ -69,7 +69,7 @@ export const NoteProvider = ({ children }) => {
             await SoftDeleteNoteService(id);
             fetchNotes();
         } catch (error) {
-            toast.error("Unable to move note to bin. Please try again.")
+            toast.error("Failed to transfer note to bin")
         }
     }
 
@@ -79,7 +79,7 @@ export const NoteProvider = ({ children }) => {
             const data = await getAllSoftDeletedNotesService();
             setNotes(data)
         }catch (error) {
-            toast.error("Unable to fetch notes from bin. Please try again.");
+            toast.error("Failed to fetch notes");
         }finally {
             setLoading(false)
         }
@@ -91,7 +91,7 @@ export const NoteProvider = ({ children }) => {
             const data = await getAllArchivedNotesService();
             setNotes(data);
         }catch (error) {
-            toast.error("Unable to fetch archived notes. Please try again.");
+            toast.error("Failed to fetch archived notes");
         }finally {
             setLoading(false);
         }   
@@ -102,7 +102,7 @@ export const NoteProvider = ({ children }) => {
             await restoreSoftDeletedNoteService(id);
             fetchNotes();
         } catch (error) {
-            toast.error("Unable to restore note. Please try again.");
+            toast.error("Failed to restore note");
         }
     };
 
@@ -111,7 +111,7 @@ export const NoteProvider = ({ children }) => {
             await archiveNoteService(id);      
             fetchNotes();
         }catch (error) {
-            toast.error("Unable to archive note. Please try again.");
+            toast.error("Failed to archive note");
         }
     }
 
@@ -120,7 +120,7 @@ export const NoteProvider = ({ children }) => {
             await unarchiveNoteService(id);
             getAllArchivedNotes();
         }catch (error) {
-            toast.error("Unable to unarchive note. Please try again.");
+            toast.error("Failed to unarchive note");
         }
     }
 
@@ -129,7 +129,7 @@ export const NoteProvider = ({ children }) => {
             await deleteNoteService(id);
             getAllSoftDeletedNotes();
         }catch (error) {
-            toast.error("Unable to delete note. Please try again.");   
+            toast.error("Failed to delete note");   
         }
     }
 
@@ -138,7 +138,7 @@ export const NoteProvider = ({ children }) => {
             await restoreDeletedNoteService(id);
             getAllSoftDeletedNotes();
         }catch (error) {
-            toast.error("Unable to restore deleted note. Please try again.");
+            toast.error("Failed to restore deleted note");
         }
     };
 
@@ -148,7 +148,7 @@ export const NoteProvider = ({ children }) => {
             const data = await getFilteredSortedNotesService(filters);
             setNotes(data);
         } catch (error) {
-            toast.error("Unable to fetch filtered notes. Please try again.");
+            toast.error("Failed to fetch filtered notes");
         } finally {
             setLoading(false);
         }

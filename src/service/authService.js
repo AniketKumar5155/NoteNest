@@ -13,6 +13,7 @@ export const signupService = async (formData) => {
 
 export const loginService = async (formData) => {
     const res = await axiosAuthInstance.post('/login', formData)
+    console.log("Login service response:", res.data);
     return res.data;
 }
 

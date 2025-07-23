@@ -12,36 +12,32 @@ const Header = () => {
   const ProfileDropdown = () => {
     const options = [
       {
-        label: (
-          <Link to="/profile" className="block w-full text-left">
-            My Profile
-          </Link>
-        ),
-        value: "profile",
+        label: "My Profile",
+        onClick: () => navigate("/profile"),
         className: "hover:bg-gray-100",
       },
       {
         label: "Logout",
-        value: "logout",
         onClick: () => {
-          logout();                          // 1. Clears auth context
-          toast.success("You have been logged out successfully.");
-          navigate("/login");               // 3. Redirect to login
+          logout();
+          toast.success("Logged out successfully");
+          navigate("/login");
         },
-      }
-
+        className: "text-red-600 hover:bg-gray-100",
+      },
     ];
 
     return (
       <Dropdown
         trigger={
           <img
-            src={`https://ui-avatars.com/api/?name=${auth.user?.first_name || ""}+${auth.user?.last_name || ""}`}
+            src={`https://ui-avatars.com/api/?name=${auth.user.first_name}+${auth.user.last_name}`}
             alt="Profile"
             className="w-8 h-8 rounded-full cursor-pointer"
           />
         }
         options={options}
+        // 🟡 No selectedLabel, so no ticks shown
       />
     );
   };
