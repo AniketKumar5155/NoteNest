@@ -25,7 +25,7 @@ const Main = ({ filter = "active" }) => {
   }, [filter]);
 
   return (
-    <div className="bg-amber-100 py-2 h-[calc(100vh-88px)] overflow-y-auto gap-1 flex flex-col">
+    <div className="gap-1 flex flex-col pt-1 pb-1 bg-amber-100 min-h-screen">
       {loading ? (
         <p className="text-center text-gray-600">Loading notes...</p>
       ) : notes.length === 0 ? (

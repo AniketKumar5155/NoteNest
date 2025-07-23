@@ -32,17 +32,17 @@ const SignupForm = () => {
   const handleGetOtp = async () => {
     const { email } = formData;
     if (!email) {
-      toast.error("Please enter your email address to receive an OTP.");
+      toast.error("Please enter your email to receive OTP");
       return;
     }
 
     try {
       setOtpLoading(true);
       await getOtp(email);
-      toast.success("OTP has been sent to your email address.");
+      toast.success("OTP sent successfully");
       setSentOtp(true);
     } catch (err) {
-      toast.error("Unable to send OTP. Please try again.");
+      toast.error("Failed to send OTP");
     } finally {
       setOtpLoading(false);
     }
@@ -55,19 +55,19 @@ const SignupForm = () => {
       const validated = signupSchema.parse(formData);
 
       if (!isValidOtp(validated.otp)) {
-        toast.error("Please enter a valid 6-digit OTP.");
+        toast.error("Enter a valid 6-digit numeric OTP");
         return;
       }
 
       await verifyOtp(validated.email, validated.otp);
       await signup(validated);
 
-      toast.success("Signup completed successfully.");
+      toast.success("Signup successful");
     } catch (err) {
       if (err.name === "ZodError") {
-        err.errors.forEach((e) => toast.error("Signup error: " + e.message));
+        err.errors.forEach((e) => toast.error(e.message));
       } else {
-        toast.error("Unable to complete signup. Please try again.");
+        toast.error("Signup failed");
       }
     }
   };

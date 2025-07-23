@@ -5,6 +5,7 @@ import InputField from "./InputField";
 import { loginSchema } from "../shared/schemas/authSchemas";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
+import { loginService } from "../service/authService";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -18,17 +19,25 @@ const LoginForm = () => {
   };
 
   const handleLogin = async (e) => {
+    // console.log("Form data before login:", formData);
     e.preventDefault();
     try {
       const validated = loginSchema.parse(formData);
-      await login(validated);
-      toast.success("Login successful.");
+      console.log("Validated data:", validated);
+
+      const { accessToken, user  } = await loginService(validated);
+      // console.log("Login service response:", user, accessToken);
+      login(user, accessToken);
+      // console.log("Login successful:", user);
+      // console.log("Access token:", accessToken);
+      toast.success("Logged in successfully");
       navigate("/", { replace: true });
+      // console.log("Navigated to home page");
     } catch (err) {
-      if (err.name === "ZodError") { 
-        err.errors.forEach((e) => toast.error("Login error: " + e.message));
+      if (err.name === "ZodError") {
+        err.errors.forEach((e) => toast.error(e.message));
       } else {
-        toast.error(err.response?.data?.message || "Unable to log in. Please check your credentials and try again.");
+        toast.error(err.response?.data?.message || "Login failed");
       }
     }
   };

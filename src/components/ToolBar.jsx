@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNotes } from "../context/NoteContext";
 import Filter from "./Filter";
 import Sort from "./Sort";
 import Search from "./Search";
@@ -7,23 +6,7 @@ import Dropdown from "./Dropdown";
 
 const ToolBar = ({ page, category }) => {
   const [sort, setSort] = useState(null);
-  const { getFilteredSortedNotes } = useNotes();
-
-  const handleSortSelect = (newSort) => {
-    setSort(newSort);
-    getFilteredSortedNotes({
-      sortBy: newSort?.field,
-      order:
-        newSort?.direction === "up"
-          ? "ASC"
-          : newSort?.direction === "down"
-            ? "DESC"
-            : undefined,
-      category,
-    });
-  };
-
-  // You can add a similar handler for filter if needed
+  // Example: { field: "title", direction: "up" } or null
 
   return (
     <>
@@ -31,31 +14,27 @@ const ToolBar = ({ page, category }) => {
         <Search />
 
         <div className="flex gap-5 pr-3">
-          {/* Sort Dropdown */}
           <Dropdown
             trigger={<Sort />}
             selectedSort={sort}
-            onSelect={handleSortSelect}
+            onSelect={setSort}
+            extraFilters={{ category, is_pinned: true }} // optional
             options={[
               { label: "Sort by", isLabel: true },
               { label: "Created At", value: "created_at" },
               { label: "Updated At", value: "updated_at" },
               { label: "Title", value: "title" },
             ]}
-            enableFilterSort={true}
           />
 
-          {/* Filter Dropdown */}
           <Dropdown
             trigger={<Filter />}
             options={[
-              { label: "status", isLabel: true },
               { label: "deleted", value: "deleted" },
               { label: "archived", value: "archived" },
               { label: "category", isLabel: true },
               { label: `${category}`, value: "category" },
             ]}
-            enableFilterSort={true}
           />
         </div>
       </div>
@@ -66,6 +45,6 @@ const ToolBar = ({ page, category }) => {
 
     </>
   );
-}
+};
 
 export default ToolBar;

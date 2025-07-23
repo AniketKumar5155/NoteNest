@@ -1,12 +1,10 @@
 import { useEffect, useRef, useState } from "react";
-import { useNotes } from "../context/NoteContext";
 
-const Dropdown = ({ trigger, options = [], selectedSort, onSelect, extraFilters = {} }) => {
+const Dropdown = ({ trigger, options = [], selectedSort, onSelect }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef(null);
-  const { getFilteredSortedNotes } = useNotes();
 
-  const toggleDropdown = () => setOpen((prev) => !prev);
+  const toggleDropdown = () => setOpen(!open);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -18,29 +16,16 @@ const Dropdown = ({ trigger, options = [], selectedSort, onSelect, extraFilters 
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleOptionClick = (option) => {
-    
-    if (option.onClick) {
-      option.onClick();
-      setOpen(false);
-      return;
-    }
-
-    
+  const handleOptionClick = (value) => {
     let newDirection = "up";
-    if (selectedSort?.field === option.value) {
+
+    if (selectedSort?.field === value) {
       if (selectedSort.direction === "up") newDirection = "down";
       else if (selectedSort.direction === "down") newDirection = null;
     }
-    const newSort = newDirection ? { field: option.value, direction: newDirection } : null;
+
+    const newSort = newDirection ? { field: value, direction: newDirection } : null;
     onSelect?.(newSort);
-    if (typeof enableFilterSort !== 'undefined' && enableFilterSort) {
-      getFilteredSortedNotes({
-        sortBy: newSort?.field,
-        order: newSort?.direction,
-        ...extraFilters,
-      });
-    }
     setOpen(false);
   };
 
@@ -55,6 +40,7 @@ const Dropdown = ({ trigger, options = [], selectedSort, onSelect, extraFilters 
           ref={dropdownRef}
           className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg z-50 overflow-hidden border border-gray-200"
         >
+          {/* Triangle pointer */}
           <div className="absolute -top-2 right-5">
             <div className="w-0 h-0 border-l-[6px] border-r-[6px] border-b-[6px] border-transparent border-b-white" />
           </div>
@@ -71,11 +57,12 @@ const Dropdown = ({ trigger, options = [], selectedSort, onSelect, extraFilters 
               ) : (
                 <div
                   key={option.value}
-                  onClick={() => handleOptionClick(option)}
+                  onClick={() => handleOptionClick(option.value)}
                   className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm flex justify-between items-center"
                 >
                   <span className="flex items-center gap-2">
-                    {selectedSort && selectedSort.field === option.value && (
+                    {/* Tick only if selected */}
+                    {selectedSort?.field === option.value && (
                       <span className="text-green-500">✔</span>
                     )}
                     <span>{option.label}</span>
@@ -84,7 +71,8 @@ const Dropdown = ({ trigger, options = [], selectedSort, onSelect, extraFilters 
                     )}
                   </span>
 
-                  {selectedSort && selectedSort.field === option.value && selectedSort.direction && (
+                  {/* Arrow for direction */}
+                  {selectedSort?.field === option.value && selectedSort.direction && (
                     <span className="text-sm text-gray-600">
                       {selectedSort.direction === "up"
                         ? "↑"
