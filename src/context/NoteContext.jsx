@@ -12,6 +12,7 @@ import {
     deleteNoteService,
     restoreDeletedNoteService,
     unarchiveNoteService,
+    getFilteredSortedNotesService
 } from "../service/noteService";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
@@ -139,7 +140,21 @@ export const NoteProvider = ({ children }) => {
         }catch (error) {
             toast.error("Failed to restore deleted note");
         }
-    }
+    };
+
+    const getFilteredSortedNotes = async (filters) => {
+        try {
+            setLoading(true);
+            const data = await getFilteredSortedNotesService(filters);
+            setNotes(data);
+        } catch (error) {
+            toast.error("Failed to fetch filtered notes");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+
 
     useEffect(() => {
         if(user){
@@ -165,6 +180,7 @@ export const NoteProvider = ({ children }) => {
                 deleteNote,
                 restoreDeletedNote,
                 unarchiveNote,
+                getFilteredSortedNotes,
             }}
         >
             {children}

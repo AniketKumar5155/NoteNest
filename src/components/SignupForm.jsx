@@ -14,12 +14,12 @@ const SignupForm = () => {
   const [otpLoading, setOtpLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    first_name: "",
-    last_name: "",
-    username: "",
-    email: "",
-    password: "",
-    confirm_password: "",
+    first_name: "Test1",
+    last_name: "Test1",
+    username: "Test1",
+    email: "aniketkr5155@gmail.com",
+    password: "Aniket@123",
+    confirm_password: "Aniket@123",
     otp: "",
   });
 
