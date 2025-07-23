@@ -88,7 +88,7 @@ const NoteCard = ({ id, title }) => {
   };
 
   return (
-    <div className="relative flex justify-between items-center p-4 bg-amber-300 rounded shadow mx-5 hover:bg-amber-400 transition-colors">
+    <div className="relative flex justify-between items-center p-4 bg-amber-300 rounded mx-5 hover:bg-amber-400 transition-colors">
       <Link to={`/note/${id}`} className="flex-1">
         <p className="text-lg font-medium break-all whitespace-normal">
           {title}
