@@ -25,7 +25,7 @@ const Main = ({ filter = "active" }) => {
   }, [filter]);
 
   return (
-    <div className="gap-1 flex flex-col pt-1 pb-1 bg-amber-100 min-h-screen">
+<div className="gap-1 flex flex-col pt-1 pb-1 bg-[#ffefad]">
       {loading ? (
         <p className="text-center text-gray-600">Loading notes...</p>
       ) : notes.length === 0 ? (

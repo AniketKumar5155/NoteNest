@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import BurgerMenu from "./BurgerMenu";
 import Button from "./Button";
-import { useAuth } from "../context/AuthContext";
-import Dropdown from "./Dropdown";
+import { useAuth, } from "../context/AuthContext";
+import { useState } from "react";
 import { toast } from "react-toastify";
 
 const Header = () => {
@@ -10,35 +10,44 @@ const Header = () => {
   const navigate = useNavigate();
 
   const ProfileDropdown = () => {
-    const options = [
-      {
-        label: "My Profile",
-        onClick: () => navigate("/profile"),
-        className: "hover:bg-gray-100",
-      },
-      {
-        label: "Logout",
-        onClick: () => {
-          logout();
-          toast.success("Logged out successfully");
-          navigate("/login");
-        },
-        className: "text-red-600 hover:bg-gray-100",
-      },
-    ];
-
+    const [isOpen, setIsOpen] = useState(false);
+    const handleProfile = () => {
+      setIsOpen(false);
+      navigate("/profile");
+    };
+    const handleLogout = () => {
+      setIsOpen(false);
+      logout();
+      toast.success("Logged out successfully");
+      navigate("/login");
+    };
     return (
-      <Dropdown
-        trigger={
-          <img
-            src={`https://ui-avatars.com/api/?name=${auth.user.first_name}+${auth.user.last_name}`}
-            alt="Profile"
-            className="w-8 h-8 rounded-full cursor-pointer"
-          />
-        }
-        options={options}
-        // 🟡 No selectedLabel, so no ticks shown
-      />
+      <div className="relative inline-block text-left">
+        <img
+          src={`https://ui-avatars.com/api/?name=${auth.user.first_name}+${auth.user.last_name}`}
+          alt="Profile"
+          className="w-8 h-8 rounded-full cursor-pointer"
+          onClick={() => setIsOpen((prev) => !prev)}
+        />
+        {isOpen && (
+          <div className="absolute right-0 mt-2 w-40 bg-white rounded-xl shadow-lg z-50 overflow-hidden border border-gray-200">
+            <div className="py-2">
+              <div
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm"
+                onClick={handleProfile}
+              >
+                My Profile
+              </div>
+              <div
+                className="px-4 py-2 hover:bg-gray-100 cursor-pointer text-sm text-red-600"
+                onClick={handleLogout}
+              >
+                Logout
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     );
   };
 
