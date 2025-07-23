@@ -37,7 +37,7 @@ const NoteEditorHeader = () => {
             setLoading(true);
             const note = await getNoteById(id);
             if (!note) {
-                toast.error("Note not found");
+            toast.error("Note not found. Please check the note and try again.");
                 return;
             }
 
@@ -46,10 +46,10 @@ const NoteEditorHeader = () => {
                 return;
             }
             await archiveNote(id);
-            toast.success("Note archived successfully");
+            toast.success("Note has been archived successfully.");
         } catch (error) {
-            console.error("Error archiving note:", error);
-            toast.error("Failed to archive note");
+            // Optionally log to a monitoring service if needed
+            toast.error("Unable to archive note. Please try again.");
         } finally {
             setLoading(false);
         }

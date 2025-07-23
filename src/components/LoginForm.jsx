@@ -22,13 +22,13 @@ const LoginForm = () => {
     try {
       const validated = loginSchema.parse(formData);
       await login(validated);
-      toast.success("Logged in successfully");
+      toast.success("Login successful.");
       navigate("/", { replace: true });
     } catch (err) {
       if (err.name === "ZodError") { 
-        err.errors.forEach((e) => toast.error(e.message));
+        err.errors.forEach((e) => toast.error("Login error: " + e.message));
       } else {
-        toast.error(err.response?.data?.message || "Login failed");
+        toast.error(err.response?.data?.message || "Unable to log in. Please check your credentials and try again.");
       }
     }
   };

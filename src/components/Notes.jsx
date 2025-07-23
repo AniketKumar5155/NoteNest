@@ -19,7 +19,7 @@ const Notes = () => {
       setTitle(noteData.title);
       setContent(noteData.content);
     } catch (error) {
-      toast.error("Ek note nahi fetch ho paa raha hain")
+      toast.error("Unable to fetch the note. Please try again.")
     }
   }
   useEffect(() => {
@@ -30,7 +30,7 @@ const Notes = () => {
 
   const handleSave = async () => {
     if (!title.trim()) {
-      toast.error("Title is required");
+      toast.error("Please enter a title for your note.");
       return;
     }
 
@@ -40,17 +40,16 @@ const Notes = () => {
         const noteData = await updateNoteService(id, { title, content });
         setTitle(noteData.title);
         setContent(noteData.content);
-        toast.success("Note saved");
+        toast.success("Note updated successfully.");
       }
       else {
         const newNote = await createNoteService({ title, content });
         const newId = newNote.id;
         navigate(`/note/${newId}`)
-        toast.success('HELLO FRIENDS CHAI PILO')
+        toast.success("Note created successfully..");
       }
     } catch (error) {
-      console.error("Error saving or fetching note:", error);
-      toast.error("Failed to save");
+      toast.error("An error occurred while saving the note. Please try again.");
     } finally {
       setLoading(false);
     }
