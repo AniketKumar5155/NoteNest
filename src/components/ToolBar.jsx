@@ -8,7 +8,8 @@ import { useNotes } from "../context/NoteContext";
 const ToolBar = ({ page }) => {
   const { getFilteredSortedNotes } = useNotes();
 
-  const [isOpen, setIsOpen] = useState(false);
+  const [isSortOpen, setIsSortOpen] = useState(false);
+  const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [sortBy, setSortBy] = useState(null);
   const [sortOrder, setSortOrder] = useState(null);
 
@@ -100,35 +101,36 @@ const ToolBar = ({ page }) => {
 
   return (
     <>
-      <div className="bg-amber-300 flex justify-between items-center p-3 shadow-md">
+      <div className="bg-amber-300 flex justify-between items-center p-3 shadow-md h-[64px] ">
         <Search />
         <div className="flex items-center gap-4 pr-3 relative">
+          {/* Sort Icon and Dropdown */}
           <div className="relative">
             <MdOutlineSort
               size={26}
               className="cursor-pointer hover:scale-110 transition"
-              onClick={() => setIsOpen(!isOpen)}
+              onClick={() => {
+                setIsSortOpen((prev) => !prev);
+                setIsFilterOpen(false);
+              }}
             />
-            {isOpen && (
+            {isSortOpen && (
               <div className="absolute top-9 right-0 bg-white shadow-lg border rounded-xl z-20 w-48 p-3 space-y-2">
                 <h1 className="text-center text-gray-700 font-semibold border-b pb-2">
                   Sort by
                 </h1>
-
                 <div
                   className={`${dropdownOptionsCss} flex items-center gap-2`}
                   onClick={() => handleSort("created_at")}
                 >
                   Created at {sortState["created_at"]}
                 </div>
-
                 <div
                   className={`${dropdownOptionsCss} flex items-center gap-2`}
                   onClick={() => handleSort("updated_at")}
                 >
                   Updated at {sortState["updated_at"]}
                 </div>
-
                 <div
                   className={`${dropdownOptionsCss} flex items-center gap-2`}
                   onClick={() => handleSort("title")}
@@ -139,11 +141,34 @@ const ToolBar = ({ page }) => {
             )}
           </div>
 
+          {/* Filter Icon and Dropdown */}
           <div className="relative">
             <CiFilter
               size={26}
               className="cursor-pointer hover:scale-110 transition"
+              onClick={() => {
+                setIsFilterOpen((prev) => !prev);
+                setIsSortOpen(false);
+              }}
             />
+            {isFilterOpen && (
+              <div className="absolute top-9 right-0 bg-white shadow-lg border rounded-xl z-20 w-48 p-3 space-y-2">
+                <h1 className="text-center text-gray-700 font-semibold border-b pb-2">
+                  Filter by
+                </h1>
+
+                <label className="text-gray-500 text-sm font-medium pl-1">
+                  Status
+                </label>
+                <div className={`${dropdownOptionsCss}`}>Deleted</div>
+                <div className={`${dropdownOptionsCss}`}>Archived</div>
+
+                <label className="text-gray-500 text-sm font-medium pl-1 pt-1">
+                  Category
+                </label>
+                <div className={`${dropdownOptionsCss}`}>Work</div>
+              </div>
+            )}
           </div>
         </div>
       </div>
