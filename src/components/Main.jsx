@@ -7,7 +7,7 @@ const Main = ({ filter = "active" }) => {
   const {
     notes,
     loading,
-    fetchNotes,
+    getFilteredSortedNotes,
     getAllSoftDeletedNotes,
     getAllArchivedNotes,
   } = useNotes();
@@ -15,17 +15,16 @@ const Main = ({ filter = "active" }) => {
   useEffect(() => {
     if (filter === "deleted") {
       getAllSoftDeletedNotes();
-    }
-    else if (filter === "archived") {
+    } else if (filter === "archived") {
       getAllArchivedNotes();
-    }
-    else {
-      fetchNotes();
+    } else {
+      const storedFilters = JSON.parse(localStorage.getItem("noteFilters")) || {};
+      getFilteredSortedNotes(storedFilters);
     }
   }, [filter]);
 
   return (
-<div className="gap-1 flex flex-col pt-1 pb-1 bg-[#ffefad]">
+    <div className="gap-1 flex flex-col pt-1 pb-1 bg-[#ffefad] min-h-screen">
       {loading ? (
         <p className="text-center text-gray-600">Loading notes...</p>
       ) : notes.length === 0 ? (

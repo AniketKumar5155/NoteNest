@@ -20,14 +20,15 @@ import { toast } from "react-toastify";
 const NoteContext = createContext();
 
 export const NoteProvider = ({ children }) => {
-    const { user } = useAuth()
+    const { user } = useAuth();
     const [notes, setNotes] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [filters, setFilters] = useState({ sortBy: "created_at", order: "DESC" });
 
     const fetchNotes = async () => {
         try {
             setLoading(true);
-            const data = await getAllNotesService();
+            const data = await getFilteredSortedNotesService(filters);
             setNotes(data);
         } catch (err) {
             toast.error("Failed to load notes");
@@ -35,7 +36,6 @@ export const NoteProvider = ({ children }) => {
             setLoading(false);
         }
     };
-
 
     const createNote = async ({ title, content }) => {
         try {
@@ -45,7 +45,6 @@ export const NoteProvider = ({ children }) => {
             toast.error("Failed to create note");
         }
     };
-
 
     const updateNote = async (id, updatedData) => {
         try {
@@ -69,33 +68,33 @@ export const NoteProvider = ({ children }) => {
             await SoftDeleteNoteService(id);
             fetchNotes();
         } catch (error) {
-            toast.error("Failed to transfer note to bin")
+            toast.error("Failed to transfer note to bin");
         }
-    }
+    };
 
     const getAllSoftDeletedNotes = async () => {
         try {
-            setLoading(true)
+            setLoading(true);
             const data = await getAllSoftDeletedNotesService();
-            setNotes(data)
-        }catch (error) {
+            setNotes(data);
+        } catch (error) {
             toast.error("Failed to fetch notes");
-        }finally {
-            setLoading(false)
+        } finally {
+            setLoading(false);
         }
-    }
+    };
 
     const getAllArchivedNotes = async () => {
         try {
             setLoading(true);
             const data = await getAllArchivedNotesService();
             setNotes(data);
-        }catch (error) {
+        } catch (error) {
             toast.error("Failed to fetch archived notes");
-        }finally {
+        } finally {
             setLoading(false);
-        }   
-    }
+        }
+    };
 
     const restoreSoftDeletedNote = async (id) => {
         try {
@@ -108,44 +107,46 @@ export const NoteProvider = ({ children }) => {
 
     const archiveNote = async (id) => {
         try {
-            await archiveNoteService(id);      
+            await archiveNoteService(id);
             fetchNotes();
-        }catch (error) {
+        } catch (error) {
             toast.error("Failed to archive note");
         }
-    }
+    };
 
     const unarchiveNote = async (id) => {
         try {
             await unarchiveNoteService(id);
             getAllArchivedNotes();
-        }catch (error) {
+        } catch (error) {
             toast.error("Failed to unarchive note");
         }
-    }
+    };
 
     const deleteNote = async (id) => {
         try {
             await deleteNoteService(id);
             getAllSoftDeletedNotes();
-        }catch (error) {
-            toast.error("Failed to delete note");   
+        } catch (error) {
+            toast.error("Failed to delete note");
         }
-    }
+    };
 
     const restoreDeletedNote = async (id) => {
-        try {  
+        try {
             await restoreDeletedNoteService(id);
             getAllSoftDeletedNotes();
-        }catch (error) {
+        } catch (error) {
             toast.error("Failed to restore deleted note");
         }
     };
 
-    const getFilteredSortedNotes = async (filters) => {
+    const getFilteredSortedNotes = async (newFilters = {}) => {
         try {
             setLoading(true);
-            const data = await getFilteredSortedNotesService(filters);
+            const updatedFilters = { ...filters, ...newFilters };
+            setFilters(updatedFilters);
+            const data = await getFilteredSortedNotesService(updatedFilters);
             setNotes(data);
         } catch (error) {
             toast.error("Failed to fetch filtered notes");
@@ -154,14 +155,11 @@ export const NoteProvider = ({ children }) => {
         }
     };
 
-
-
     useEffect(() => {
-        if(user){
+        if (user) {
             fetchNotes();
         }
     }, [user]);
-
 
     return (
         <NoteContext.Provider
@@ -181,6 +179,7 @@ export const NoteProvider = ({ children }) => {
                 restoreDeletedNote,
                 unarchiveNote,
                 getFilteredSortedNotes,
+                filters
             }}
         >
             {children}
