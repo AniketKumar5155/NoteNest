@@ -5,7 +5,7 @@ import { createNoteService, getNoteByIdService, updateNoteService } from "../ser
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useParams, useNavigate } from "react-router-dom";
-// 44px
+
 const Notes = () => {
   const navigate = useNavigate();
   const { id } = useParams();
@@ -14,12 +14,12 @@ const Notes = () => {
   const [loading, setLoading] = useState(false)
 
   const getNoteById = async () => {
-    try {
+    try {0
       const noteData = await getNoteByIdService(id);
       setTitle(noteData.title);
       setContent(noteData.content);
     } catch (error) {
-      toast.error("Ek note nahi fetch ho paa raha hain")
+      toast.error("Failed to fetch note");
     }
   }
   useEffect(() => {

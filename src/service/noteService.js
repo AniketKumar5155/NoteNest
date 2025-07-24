@@ -43,7 +43,7 @@ export const restoreSoftDeletedNoteService = async (id) => {
 export const archiveNoteService = async (id) => {
     const res = await axiosNoteInstance.patch(`/${id}/archive`)
     return res.data.data;
-}   
+}
 
 export const unarchiveNoteService = async (id) => {
     const res = await axiosNoteInstance.patch(`/${id}/unarchive`)
@@ -61,19 +61,20 @@ export const restoreDeletedNoteService = async (id) => {
     return res.data.data;
 }
 
-export const getFilteredSortedNotesService = async (
-    sortBy = "createdAt",
-    order = "desc",
-    category,   
-    is_pinned,
-) => {
-    const res = await axiosNoteInstance.get('/filter', {
-        params: {
-            sortBy,
-            order,
-            category,
-            is_pinned,
-        }
-    });
+export const getFilteredSortedNotesService = async (filters = {}) => {
+    const {
+        sortBy = "created_at",
+        order = "DESC",       
+        category,
+        is_pinned,
+    } = filters;
+    const params = {
+        sortBy,
+        order,
+        category,
+        is_pinned: typeof is_pinned === "boolean" ? String(is_pinned) : undefined,
+    };
+    const res = await axiosNoteInstance.get('/filter', { params });
     return res.data.data;
 }
+
