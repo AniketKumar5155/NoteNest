@@ -83,7 +83,7 @@ const Notes = () => {
           </div>
         </div>
         <hr />
-        <textarea name="content" placeholder="Content" className="w-full h-[84vh] px-2 pt-1 bg-amber-200 focus:outline-none focus:ring-0 focus:border-none" value={content} onChange={(e) => setContent(e.target.value)} ></textarea>
+        <textarea name="content" placeholder="Content" className="w-full h-[84vh] px-2 pt-1 bg-amber-200 focus:outline-none  min-h-screen focus:ring-0 focus:border-none" value={content} onChange={(e) => setContent(e.target.value)} ></textarea>
       </div>
     </>
   )
