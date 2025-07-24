@@ -59,15 +59,19 @@ const ToolBar = ({ page }) => {
                   Sort by
                 </h1>
 
-                {["created_at", "updated_at", "title"].map((field) => (
-                  <div
-                    key={field}
-                    className="cursor-pointer px-2 py-1 rounded hover:bg-amber-100 hover:text-amber-600 transition flex justify-between"
-                    onClick={() => handleSort(field)}
-                  >
-                    {field.replace(/_/g, " ").replace(/^([a-z])/, (match) => match.toUpperCase())} {renderArrow(field)}
-                  </div>
-                ))}
+            {["created_at", "updated_at", "title"].map((field) => (
+  <div
+    key={field}
+    className="cursor-pointer px-2 py-1 rounded hover:bg-amber-100 hover:text-amber-600 transition flex justify-between"
+    onClick={() => handleSort(field)}
+  >
+    <span className="capitalize">
+      {field.replace(/_/g, " ").replace(/^([a-z])/, (match) => match.toUpperCase())}
+    </span>
+    <span className="font-bold ml-2">{renderArrow(field)}</span>
+  </div>
+))}
+
 
               </div>
             )}
