@@ -5,15 +5,20 @@ import Main from "../components/Main";
 const Homepage = () => {
   return (
     <div className="flex flex-col h-screen">
-      <div className="h-22">
+      {/* <div className="h-[44px]"> */}
+        {/* <Header /> */}
+      {/* </div> */}
+      <div className="h-[64px]">
         <ToolBar />
       </div>
-      <div className="flex-1 overflow-y-auto overflow-x-hidden pb-24">
+
+      {/* This div fills remaining space and scrolls */}
+      <div className="flex-1 overflow-y-auto bg-[#ffefad]">
         <Main />
       </div>
     </div>
-
   );
 };
+
 
 export default Homepage;

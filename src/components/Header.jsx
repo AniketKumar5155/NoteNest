@@ -52,7 +52,7 @@ const Header = () => {
   };
 
   return (
-    <div className="flex justify-between p-1.5 bg-amber-100 items-center">
+    <div className="flex justify-between p-1.5 bg-amber-100 items-center h-[44px]">
       <BurgerMenu />
       <div className="font-bold text-2xl">NoteNest</div>
       {auth.user ? (
