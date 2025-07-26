@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import {
-    getAllNotesService,
     getNoteByIdService,
     createNoteService,
     updateNoteService,
@@ -12,7 +11,10 @@ import {
     deleteNoteService,
     restoreDeletedNoteService,
     unarchiveNoteService,
-    getFilteredSortedNotesService
+    getFilteredSortedNotesService,
+    createCategoryService,
+    getAllActiveCategoriesService,
+    updateCategoryService
 } from "../service/noteService";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
@@ -22,8 +24,14 @@ const NoteContext = createContext();
 export const NoteProvider = ({ children }) => {
     const { user } = useAuth();
     const [notes, setNotes] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState({ sortBy: "created_at", order: "DESC" });
+
+    useEffect(() => {
+        console.log("Categories updated:", categories);
+    }, [categories]);
+
 
     const fetchNotes = async () => {
         try {
@@ -155,6 +163,35 @@ export const NoteProvider = ({ children }) => {
         }
     };
 
+    const createCategory = async (name) => {
+        try {
+            const newCategory = await createCategoryService(name);
+            setCategories((prev) => [...prev, newCategory]);
+        } catch (error) {
+            toast.error("Failed to create category");
+        }
+    }
+
+    const updateCatgory = async (id, name) => {
+        try {
+            const updatedCategory = await updateCategoryService(id, name);
+            setCategories((prev) => prev.map(cat => cat.id === id ? updatedCategory : cat));
+        } catch (error) {
+            toast.error("Failed to update category");
+        }
+    }
+
+    const getAllActiveCategories = async () => {
+        try {
+            const data = await getAllActiveCategoriesService();
+            console.log("context,", data)
+            setCategories(data);
+            console.log(categories)
+        } catch (error) {
+            toast.error("Failed to fetch categories");
+        }
+    }
+
     useEffect(() => {
         if (user) {
             fetchNotes();
@@ -166,6 +203,7 @@ export const NoteProvider = ({ children }) => {
             value={{
                 notes,
                 loading,
+                categories,
                 fetchNotes,
                 createNote,
                 updateNote,
@@ -179,7 +217,9 @@ export const NoteProvider = ({ children }) => {
                 restoreDeletedNote,
                 unarchiveNote,
                 getFilteredSortedNotes,
-                filters
+                createCategory,
+                getAllActiveCategories,
+                updateCatgory,
             }}
         >
             {children}
