@@ -45,7 +45,7 @@ const ToolBar = ({ page }) => {
 
   return (
     <>
-      <div className="bg-amber-300 flex justify-between items-center p-3 shadow-md h-[64px]">
+      <div className="bg-amber-300 flex justify-between items-center px-3 shadow-md h-[64px]">
         <Search />
 
         <div className="flex items-center gap-4 pr-3 relative">
