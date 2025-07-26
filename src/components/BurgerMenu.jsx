@@ -135,7 +135,7 @@ const BurgerMenu = () => {
                               </div>                              <span>{cat.name}</span>
                             </Link>
 
-                            <button
+                            <button 
                               onClick={() => {
                                 setIsEditing(true);
                                 setName(cat.name);

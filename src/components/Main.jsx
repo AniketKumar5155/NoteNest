@@ -25,7 +25,7 @@ const Main = ({ filter = "active" }) => {
 
   return (
     <>
-    <div className="flex-1 overflow-y-auto gap-1 flex flex-col pt-1 pb-1 bg-[#ffefad] min-h-[calc(100vh-130px)] ">
+<div className="flex-1 overflow-y-auto gap-1 flex flex-col pt-1 pb-12 bg-[#ffefad]">
       {loading ? (
         <p className="text-center text-gray-600">Loading notes...</p>
       ) : notes.length === 0 ? (
