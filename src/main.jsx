@@ -5,16 +5,12 @@ import App from './App.jsx';
 import { AuthProvider } from "./context/AuthContext";
 import { NoteProvider } from './context/NoteContext';
 
-
-
 createRoot(document.getElementById('root')).render(
-  <>
     <BrowserRouter>
       <AuthProvider>
         <NoteProvider>
           <App />
-          </NoteProvider>
+        </NoteProvider>
       </AuthProvider>
     </BrowserRouter>
-  </>
 );

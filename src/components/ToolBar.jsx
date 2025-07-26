@@ -6,14 +6,17 @@ import { useNotes } from "../context/NoteContext";
 
 const ToolBar = ({ page }) => {
   const sortRef = useRef(null);
-  const [isSortOpen, setIsSortOpen] = useState(false);
-  const [sortBy, setSortBy] = useState("created_at");
-  const [sortOrder, setSortOrder] = useState("DESC");
 
+  const [sortBy, setSortBy] = useState(() => localStorage.getItem("sortBy") || "created_at");
+  const [sortOrder, setSortOrder] = useState(() => localStorage.getItem("sortOrder") || "DESC");
+  const [isSortOpen, setIsSortOpen] = useState(false);
   const { getFilteredSortedNotes } = useNotes();
 
   useEffect(() => {
     getFilteredSortedNotes({ sortBy, order: sortOrder });
+
+    localStorage.setItem("sortBy", sortBy);
+    localStorage.setItem("sortOrder", sortOrder);
   }, [sortBy, sortOrder]);
 
   useEffect(() => {
@@ -59,20 +62,23 @@ const ToolBar = ({ page }) => {
                   Sort by
                 </h1>
 
-            {["created_at", "updated_at", "title"].map((field) => (
-  <div
-    key={field}
-    className="cursor-pointer px-2 py-1 rounded hover:bg-amber-100 hover:text-amber-600 transition flex justify-between"
-    onClick={() => handleSort(field)}
-  >
-    <span className="capitalize">
-      {field.replace(/_/g, " ").replace(/^([a-z])/, (match) => match.toUpperCase())}
-    </span>
-    <span className="font-bold ml-2">{renderArrow(field)}</span>
-  </div>
-))}
-
-
+                {["created_at", "updated_at", "title"].map((field) => (
+                  <div
+                    key={field}
+                    className={`cursor-pointer px-2 py-1 rounded transition flex justify-between ${sortBy === field
+                        ? "bg-amber-200 text-amber-800 font-semibold"
+                        : "hover:bg-amber-100 hover:text-amber-600"
+                      }`}
+                    onClick={() => handleSort(field)}
+                  >
+                    <span className="capitalize">
+                      {field
+                        .replace(/_/g, " ")
+                        .replace(/^([a-z])/, (match) => match.toUpperCase())}
+                    </span>
+                    <span className="font-bold ml-2">{renderArrow(field)}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>

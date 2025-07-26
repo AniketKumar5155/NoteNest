@@ -50,7 +50,6 @@ export const unarchiveNoteService = async (id) => {
     return res.data.data;
 }
 
-
 export const deleteNoteService = async (id) => {
     const res = await axiosNoteInstance.delete(`/${id}/hard-delete`)
     return res.data.data;
@@ -75,6 +74,22 @@ export const getFilteredSortedNotesService = async (filters = {}) => {
         is_pinned: typeof is_pinned === "boolean" ? String(is_pinned) : undefined,
     };
     const res = await axiosNoteInstance.get('/filter', { params });
+    return res.data.data;
+}
+
+export const createCategoryService = async (name) => {
+    const res = await axiosNoteInstance.post('/category', { name });
+    return res.data.data;
+}
+
+export const updateCategoryService = async (id, name) => {
+    const res = await axiosNoteInstance.patch(`/${id}/category`, { name });
+    return res.data.data;
+}
+
+export const getAllActiveCategoriesService = async () => {
+    const res = await axiosNoteInstance.get('/active-categories');
+    console.log(res.data.data)
     return res.data.data;
 }
 
