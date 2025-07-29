@@ -5,34 +5,19 @@ export const createNoteService = async ({ title, content }) => {
     return res.data.data;
 }
 
-export const getAllNotesService = async () => {
-    const res = await axiosNoteInstance.get('/');
-    return res.data.data;
-}
-
 export const getNoteByIdService = async (id) => {
     const res = await axiosNoteInstance.get(`/${id}`)
     return res.data.data
 }
 
 export const updateNoteService = async (id, data) => {
-    const res = await axiosNoteInstance.patch(`/${id}`, data)
+    const res = await axiosNoteInstance.patch(`/${id}/update`, data)
     return res.data.data
 }
 
 export const SoftDeleteNoteService = async (id) => {
     const res = await axiosNoteInstance.patch(`/${id}/soft-delete`)
     return res.data.data
-}
-
-export const getAllArchivedNotesService = async () => {
-    const res = await axiosNoteInstance.get(`/archive`)
-    return res.data.data;
-}
-
-export const getAllSoftDeletedNotesService = async () => {
-    const res = await axiosNoteInstance.get(`/bin`)
-    return res.data.data;
 }
 
 export const restoreSoftDeletedNoteService = async (id) => {
@@ -73,8 +58,53 @@ export const getFilteredSortedNotesService = async (filters = {}) => {
         category,
         is_pinned: typeof is_pinned === "boolean" ? String(is_pinned) : undefined,
     };
-    const res = await axiosNoteInstance.get('/filter', { params });
+    const res = await axiosNoteInstance.get('/', { params });
     return res.data.data;
+}
+
+export const getAllDeletedFilteredSortedNotesService = async (filters ={}) => {
+    const {
+        sortBy = "deleted_at",
+        order = "DESC",       
+        category,
+        is_pinned,
+        is_deleted = true,
+        is_archived = false,
+    } = filters
+    const params = {
+        sortBy,
+        order,
+        category,
+        is_pinned: typeof is_pinned === "boolean" ? String(is_pinned) : undefined,
+        is_deleted,
+        is_archived,
+    }
+
+    const res = await axiosNoteInstance.get('/bin', {params});
+    return res.data.data
+}
+
+export const getAllArchivedFilteredSortedNotesService = async (filters = {}) => {
+    const {
+        sortBy = "updated_at",
+        order = "DESC",
+        category,
+        is_pinned,
+        is_deleted = false,
+        is_archived = true,
+    } = filters
+
+    const params = {
+        sortBy,
+        order,
+        category,
+        is_pinned: typeof is_pinned === "boolean" ? String(is_pinned) : undefined,
+        is_deleted,
+        is_archived,
+    }
+
+    const res = await axiosNoteInstance.get('/archive', {params});
+    return res.data.data
 }
 
 export const createCategoryService = async (name) => {
