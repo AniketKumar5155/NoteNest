@@ -4,7 +4,7 @@ import {
   verifyOtpService,
   signupService,
   loginService,
-} from "../service/authService"; // ✅ importing all services
+} from "../service/authService";
 
 const AuthContext = createContext();
 
@@ -14,7 +14,6 @@ export const AuthProvider = ({ children }) => {
     accessToken: null,
   });
 
-  // ✅ Load auth from localStorage on app start
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
     const user = localStorage.getItem("user");
@@ -24,13 +23,11 @@ export const AuthProvider = ({ children }) => {
         const parsedUser = JSON.parse(user);
         setAuth({ accessToken: token, user: parsedUser });
       } catch (err) {
-        console.error("❌ Failed to parse user from localStorage", err);
-        logout(); // fallback if localStorage is corrupted
+        logout();
       }
     }
   }, []);
 
-  // ✅ Signup function using signupService
   const signup = async (formData) => {
     const data = await signupService(formData);
     const { user, accessToken } = data;
@@ -40,7 +37,6 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  // ✅ Login function using loginService
   const login = async (formData) => {
     const data = await loginService(formData);
     const { user, accessToken } = data;
@@ -51,7 +47,6 @@ export const AuthProvider = ({ children }) => {
     return data;
   };
 
-  // ✅ OTP functions also exposed through context
   const getOtp = async (email) => {
     return await getOtpService(email);
   };
@@ -60,7 +55,6 @@ export const AuthProvider = ({ children }) => {
     return await verifyOtpService(email, otp);
   };
 
-  // ✅ Logout function
   const logout = () => {
     setAuth({ user: null, accessToken: null });
     localStorage.removeItem("accessToken");

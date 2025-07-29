@@ -4,8 +4,7 @@ import {
     createNoteService,
     updateNoteService,
     SoftDeleteNoteService,
-    getAllSoftDeletedNotesService,
-    getAllArchivedNotesService,
+    getAllArchivedFilteredSortedNotesService,
     restoreSoftDeletedNoteService,
     archiveNoteService,
     deleteNoteService,
@@ -14,7 +13,8 @@ import {
     getFilteredSortedNotesService,
     createCategoryService,
     getAllActiveCategoriesService,
-    updateCategoryService
+    updateCategoryService,
+    getAllDeletedFilteredSortedNotesService,
 } from "../service/noteService";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
@@ -27,11 +27,6 @@ export const NoteProvider = ({ children }) => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState({ sortBy: "created_at", order: "DESC" });
-
-    useEffect(() => {
-        console.log("Categories updated:", categories);
-    }, [categories]);
-
 
     const fetchNotes = async () => {
         try {
@@ -80,10 +75,10 @@ export const NoteProvider = ({ children }) => {
         }
     };
 
-    const getAllSoftDeletedNotes = async () => {
+    const getAllDeletedFilteredSortedNotes = async ({ sortBy = "deleted_at", order = "DESC" } = {}) => {
         try {
             setLoading(true);
-            const data = await getAllSoftDeletedNotesService();
+            const data = await getAllDeletedFilteredSortedNotesService({ sortBy, order });
             setNotes(data);
         } catch (error) {
             toast.error("Failed to fetch notes");
@@ -92,10 +87,10 @@ export const NoteProvider = ({ children }) => {
         }
     };
 
-    const getAllArchivedNotes = async () => {
+    const getAllArchivedFilteredSortedNotes = async ({ sortBy = "updated_at", order = "DESC" } = {}) => {
         try {
             setLoading(true);
-            const data = await getAllArchivedNotesService();
+            const data = await getAllArchivedFilteredSortedNotesService({ sortBy, order });
             setNotes(data);
         } catch (error) {
             toast.error("Failed to fetch archived notes");
@@ -107,7 +102,7 @@ export const NoteProvider = ({ children }) => {
     const restoreSoftDeletedNote = async (id) => {
         try {
             await restoreSoftDeletedNoteService(id);
-            fetchNotes();
+            getAllDeletedFilteredSortedNotes();
         } catch (error) {
             toast.error("Failed to restore note");
         }
@@ -125,7 +120,7 @@ export const NoteProvider = ({ children }) => {
     const unarchiveNote = async (id) => {
         try {
             await unarchiveNoteService(id);
-            getAllArchivedNotes();
+            getAllArchivedFilteredSortedNotes();
         } catch (error) {
             toast.error("Failed to unarchive note");
         }
@@ -134,7 +129,7 @@ export const NoteProvider = ({ children }) => {
     const deleteNote = async (id) => {
         try {
             await deleteNoteService(id);
-            getAllSoftDeletedNotes();
+            getAllDeletedFilteredSortedNotes();
         } catch (error) {
             toast.error("Failed to delete note");
         }
@@ -143,18 +138,16 @@ export const NoteProvider = ({ children }) => {
     const restoreDeletedNote = async (id) => {
         try {
             await restoreDeletedNoteService(id);
-            getAllSoftDeletedNotes();
+            getAllDeletedFilteredSortedNotes();
         } catch (error) {
             toast.error("Failed to restore deleted note");
         }
     };
 
-    const getFilteredSortedNotes = async (newFilters = {}) => {
+    const getFilteredSortedNotes = async ({ sortBy = "created_at", order = "DESC", category, is_pinned }) => {
         try {
             setLoading(true);
-            const updatedFilters = { ...filters, ...newFilters };
-            setFilters(updatedFilters);
-            const data = await getFilteredSortedNotesService(updatedFilters);
+            const data = await getFilteredSortedNotesService({ sortBy, order, category, is_pinned });
             setNotes(data);
         } catch (error) {
             toast.error("Failed to fetch filtered notes");
@@ -162,6 +155,7 @@ export const NoteProvider = ({ children }) => {
             setLoading(false);
         }
     };
+
 
     const createCategory = async (name) => {
         try {
@@ -195,8 +189,9 @@ export const NoteProvider = ({ children }) => {
     useEffect(() => {
         if (user) {
             fetchNotes();
+            getAllActiveCategories();
         }
-    }, [user]);
+    }, [user, filters]);
 
     return (
         <NoteContext.Provider
@@ -209,8 +204,8 @@ export const NoteProvider = ({ children }) => {
                 updateNote,
                 getNoteById,
                 softDeleteNote,
-                getAllSoftDeletedNotes,
-                getAllArchivedNotes,
+                getAllDeletedFilteredSortedNotes,
+                getAllArchivedFilteredSortedNotes,
                 restoreSoftDeletedNote,
                 archiveNote,
                 deleteNote,

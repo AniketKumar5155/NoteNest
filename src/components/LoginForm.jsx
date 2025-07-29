@@ -18,7 +18,6 @@ const LoginForm = () => {
   };
 
   const handleLogin = async (e) => {
-    // console.log("Form data before login:", formData);
     e.preventDefault();
     try {
       const validated = loginSchema.parse(formData);

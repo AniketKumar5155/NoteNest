@@ -10,6 +10,7 @@ import ArchivePage from "./pages/ArchivePage"
 import Header from "./components/Header"
 import { useLocation } from "react-router-dom"
 import Bin from "./pages/Bin"
+import CategoryPage from "./pages/CategoryPage"
 
 const App = () => {
   const location = useLocation();
@@ -54,6 +55,11 @@ const App = () => {
           </ProtectedRoute>
         } />
 
+          <Route path="/note/category/:categoryName" element={
+          <ProtectedRoute>
+            <CategoryPage />
+          </ProtectedRoute>
+        } />
       </Routes>
     </>
   )

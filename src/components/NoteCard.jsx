@@ -3,6 +3,8 @@ import { Link, useLocation } from "react-router-dom";
 import { useNotes } from "../context/NoteContext";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { BsThreeDotsVertical } from "react-icons/bs";
+import CategoryModal from "./CategoryModal";
 
 const NoteCard = ({ id, title }) => {
   const {
@@ -12,11 +14,19 @@ const NoteCard = ({ id, title }) => {
     unarchiveNote,
     archiveNote,
   } = useNotes();
+  
   const location = useLocation();
 
-  const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
 
+  const handleThreeDotMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+ 
   const noteStatus = () => {
     if (location.pathname.includes("bin")) return "deleted";
     if (location.pathname.includes("archive")) return "archived";
@@ -88,19 +98,15 @@ const NoteCard = ({ id, title }) => {
   };
 
   return (
-    <div className="relative flex justify-between items-center p-4 bg-amber-300 rounded mx-5 hover:bg-amber-400 transition-colors">
+    <div className="relative flex justify-between items-center p-4 bg-amber-300 rounded mx-5 hover:bg-amber-400 transition-colors overflow-visible">
       <Link to={`/note/${id}`} className="flex-1">
-        <p className="text-lg font-medium break-all whitespace-normal">
-          {title}
-        </p>
+        <p className="text-lg font-medium break-words whitespace-normal">{title}</p>
       </Link>
 
       {status === "deleted" && (
         <MdRestore
           onClick={!loading ? handleRestore : undefined}
-          className={`text-green-600 hover:text-green-700 cursor-pointer text-xl ml-4 ${
-            loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
-          }`}
+          className={`text-green-600 hover:text-green-700 cursor-pointer text-xl ml-4 ${loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
           title="Restore Note"
         />
       )}
@@ -108,9 +114,7 @@ const NoteCard = ({ id, title }) => {
       {status === "archived" && (
         <MdUnarchive
           onClick={!loading ? handleUnarchive : undefined}
-          className={`text-blue-600 hover:text-blue-700 cursor-pointer text-xl ml-4 ${
-            loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
-          }`}
+          className={`text-blue-600 hover:text-blue-700 cursor-pointer text-xl ml-4 ${loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
           title="Unarchive Note"
         />
       )}
@@ -118,9 +122,7 @@ const NoteCard = ({ id, title }) => {
       {status === "active" && (
         <MdArchive
           onClick={!loading ? handleArchive : undefined}
-          className={`text-blue-600 hover:text-blue-700 cursor-pointer text-xl ml-4 ${
-            loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
-          }`}
+          className={`text-blue-600 hover:text-blue-700 cursor-pointer text-xl ml-4 ${loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
           title="Archive Note"
         />
       )}
@@ -134,11 +136,77 @@ const NoteCard = ({ id, title }) => {
             handleDelete();
           }
         }}
-        className={`text-red-500 hover:text-red-600 cursor-pointer text-xl ml-4 ${
-          loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""
-        }`}
+        className={`text-red-500 hover:text-red-600 cursor-pointer text-xl mx-2 ${loading ? "opacity-50 cursor-not-allowed pointer-events-none" : ""}`}
         title={status === "deleted" ? "Permanently Delete" : "Move to Bin"}
       />
+
+      <BsThreeDotsVertical
+      onClick={handleThreeDotMenu}
+        className="h-5 w-5 cursor-pointer hover:text-gray-600 relative z-10"
+      />
+
+      {isOpen && (
+        <div
+          className="absolute right-4 top-12 bg-white border rounded shadow-md z-50 text-sm w-40"
+        >
+          {status === "active" && (
+            <>
+              <div
+                onClick={handleArchive}
+                disabled={loading}
+                className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+              >
+                Archive
+              </div>
+              <div
+                onClick={() => {
+                  setShowCategoryModal(true);
+                  setIsOpen(false);
+                }}
+                disabled={loading}
+                className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+              >
+                Category
+              </div>
+            </>
+          )}
+
+          {status === "archived" && (
+            <div
+              onClick={handleUnarchive}
+              disabled={loading}
+              className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+            >
+              Unarchive
+            </div>
+          )}
+
+          {status === "deleted" && (
+            <div
+              onClick={handleRestore}
+              disabled={loading}
+              className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+            >
+              Restore
+            </div>
+          )}
+
+          <div
+            onClick={() => {
+              if (status === "deleted") {
+                setConfirmingDeleteId(id);
+              } else {
+                handleDelete();
+              }
+              setIsOpen(false);
+            }}
+            disabled={loading}
+            className="block w-full px-4 py-2 text-left hover:bg-gray-100 text-red-500"
+          >
+            {status === "deleted" ? "Delete Permanently" : "Move to Bin"}
+          </div>
+        </div>
+      )}
 
       {confirmingDeleteId === id && (
         <div className="absolute top-16 right-5 bg-white shadow-md border p-3 rounded z-50 w-64">
@@ -147,22 +215,29 @@ const NoteCard = ({ id, title }) => {
             <div>Title: {title}</div>
           </p>
           <div className="flex justify-end gap-2">
-            <button
+            <div
               onClick={() => setConfirmingDeleteId(null)}
               className="text-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
               disabled={loading}
             >
               Cancel
-            </button>
-            <button
+            </div>
+            <div
               onClick={handleDelete}
               className="text-sm px-3 py-1 bg-red-500 text-white hover:bg-red-600 rounded"
               disabled={loading}
             >
               Delete
-            </button>
+            </div>
           </div>
         </div>
+      )}
+
+      {showCategoryModal && (
+        <CategoryModal
+          noteId={id}
+          onClose={() => setShowCategoryModal(false)}
+        />
       )}
     </div>
   );
