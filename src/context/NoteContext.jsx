@@ -27,18 +27,7 @@ export const NoteProvider = ({ children }) => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [filters, setFilters] = useState({ sortBy: "created_at", order: "DESC" });
-
-    const fetchNotes = async () => {
-        try {
-            setLoading(true);
-            const data = await getFilteredSortedNotesService(filters);
-            setNotes(data);
-        } catch (err) {
-            toast.error("Failed to load notes");
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [searchQuery, setSearchQuery] = useState("")
 
     const createNote = async ({ title, content }) => {
         try {
@@ -52,7 +41,7 @@ export const NoteProvider = ({ children }) => {
     const updateNote = async (id, updatedData) => {
         try {
             await updateNoteService(id, updatedData);
-            fetchNotes();
+            getFilteredSortedNotes();
         } catch (err) {
             toast.error("Failed to update note");
         }
@@ -69,7 +58,7 @@ export const NoteProvider = ({ children }) => {
     const softDeleteNote = async (id) => {
         try {
             await SoftDeleteNoteService(id);
-            fetchNotes();
+            getFilteredSortedNotes();
         } catch (error) {
             toast.error("Failed to transfer note to bin");
         }
@@ -111,7 +100,7 @@ export const NoteProvider = ({ children }) => {
     const archiveNote = async (id) => {
         try {
             await archiveNoteService(id);
-            fetchNotes();
+            getFilteredSortedNotes();
         } catch (error) {
             toast.error("Failed to archive note");
         }
@@ -178,9 +167,7 @@ export const NoteProvider = ({ children }) => {
     const getAllActiveCategories = async () => {
         try {
             const data = await getAllActiveCategoriesService();
-            console.log("context,", data)
             setCategories(data);
-            console.log(categories)
         } catch (error) {
             toast.error("Failed to fetch categories");
         }
@@ -199,7 +186,6 @@ export const NoteProvider = ({ children }) => {
                 notes,
                 loading,
                 categories,
-                fetchNotes,
                 createNote,
                 updateNote,
                 getNoteById,
@@ -215,6 +201,8 @@ export const NoteProvider = ({ children }) => {
                 createCategory,
                 getAllActiveCategories,
                 updateCatgory,
+                searchQuery,
+                setSearchQuery, 
             }}
         >
             {children}

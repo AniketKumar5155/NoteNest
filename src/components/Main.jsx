@@ -2,21 +2,30 @@ import { useEffect } from "react";
 import AddNote from "./AddNote";
 import NoteCard from "./NoteCard";
 import { useNotes } from "../context/NoteContext";
+import useDebounce from "../hooks/useDebounce";
 
 const Main = ({
-  filter = "active",           
+  filter = "active",
   sortBy = "createdAt",
   sortOrder = "desc",
-  categoryName,         
+  categoryName,
 }) => {
   const {
     notes,
     loading,
+    searchQuery,
     getFilteredSortedNotes,
     getAllDeletedFilteredSortedNotes,
     getAllArchivedFilteredSortedNotes,
   } = useNotes();
 
+  const debouncedSearch = useDebounce(searchQuery, 300);
+
+  const visibleNotes = notes.filter((note) => note.title.toLowerCase().includes(debouncedSearch.toLowerCase()));
+
+  const notesToRender = debouncedSearch.trim()
+    ? visibleNotes
+    : notes;
 
   useEffect(() => {
     const filters = {
@@ -28,26 +37,21 @@ const Main = ({
       getAllDeletedFilteredSortedNotes(filters);
     } else if (filter === "archived") {
       getAllArchivedFilteredSortedNotes(filters);
-    } 
-    else if (categoryName){
-      getFilteredSortedNotes({...filters, category: categoryName})
-    }
-    else {
+    } else if (categoryName) {
+      getFilteredSortedNotes({ ...filters, category: categoryName });
+    } else {
       getFilteredSortedNotes(filters);
     }
   }, [filter, sortBy, sortOrder, categoryName]);
-
-  console.log("categoryName in Main:", categoryName);
-
 
   return (
     <div className="flex-1 overflow-y-auto gap-1 flex flex-col pt-1 pb-36 bg-[#ffefad]">
       {loading ? (
         <p className="text-center text-gray-600">Loading notes...</p>
-      ) : !notes || notes.length === 0 ? (
+      ) : notesToRender.length === 0 ? (
         <p className="text-center text-gray-500">No notes found.</p>
       ) : (
-        notes.map((note) => (
+        notesToRender.map((note) => (
           <NoteCard
             key={note.id}
             id={note.id}
@@ -57,7 +61,7 @@ const Main = ({
         ))
       )}
 
-      {(filter === "active") && <AddNote />}
+      {filter === "active" && <AddNote />}
     </div>
   );
 };
