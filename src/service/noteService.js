@@ -119,7 +119,6 @@ export const updateCategoryService = async (id, name) => {
 
 export const getAllActiveCategoriesService = async () => {
     const res = await axiosNoteInstance.get('/active-categories');
-    console.log(res.data.data)
     return res.data.data;
 }
 

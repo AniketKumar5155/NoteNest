@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 
 const Header = () => {
   const { auth, logout } = useAuth();
+
   const navigate = useNavigate();
 
   const ProfileDropdown = () => {

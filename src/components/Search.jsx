@@ -1,29 +1,40 @@
 import TextField from '@mui/material/TextField';
 import InputAdornment from '@mui/material/InputAdornment';
 import SearchIcon from '@mui/icons-material/Search';
+import { useNotes } from '../context/NoteContext';
 
 const Search = () => {
+
+  const { searchQuery, setSearchQuery } = useNotes();
+
   return (
     <TextField
       placeholder="Search..."
       variant="outlined"
       size="small"
+      value={searchQuery}
+      onChange={(e) => setSearchQuery(e.target.value)}
       sx={{
-    minWidth: 250,  
-    flex: 1, 
-    maxWidth: 700,
-    px: 2,                      // total height of the input box
-    '& .MuiOutlinedInput-root': {       // the wrapper inside the input
-      height: 40,
-      fontSize: '14px',
-    },
-    '& input': {                         // the actual input text area
-      padding: '10px 12px',
-    },
-    '& .MuiSvgIcon-root': {             // search icon
-      fontSize: 20,
-    },
-  }}
+        fontSize: '24px',
+        fontWeight: 'bold',
+        minWidth: 250,
+        flex: 1,
+        maxWidth: 700,
+        px: 2,
+        '& .MuiOutlinedInput-root': {
+          height: 40,
+          fontSize: '14px',
+          '&.Mui-focused fieldset': {
+            borderColor: '#d97706',
+          },
+        },
+        '& input': {
+          padding: '10px 12px',
+        },
+        '& .MuiSvgIcon-root': {
+          fontSize: 20,
+        },
+      }}
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
