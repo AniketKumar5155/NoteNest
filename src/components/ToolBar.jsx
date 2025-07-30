@@ -5,7 +5,6 @@ import { MdOutlineSort } from "react-icons/md";
 import Search from "./Search";
 import { useNotes } from "../context/NoteContext";
 
-
 const ToolBar = ({ page }) => {
   const sortRef = useRef(null);
 
@@ -14,20 +13,16 @@ const ToolBar = ({ page }) => {
   const [isSortOpen, setIsSortOpen] = useState(false);
   const { getFilteredSortedNotes, getAllDeletedFilteredSortedNotes, getAllArchivedFilteredSortedNotes } = useNotes();
 
-  const  { categoryName } = useParams();
+  const { categoryName } = useParams();
 
   useEffect(() => {
-
     if (page === "BIN") {
-      getAllDeletedFilteredSortedNotes({ sortBy, order: sortOrder });
-    }
-    else if (page === "ARCHIVED") {
-      getAllArchivedFilteredSortedNotes({ sortBy, order: sortOrder })
-    }
-    else if(page === categoryName) {
-      getFilteredSortedNotes({  sortBy, order: sortOrder, category: categoryName })
-    }
-    else {
+      getAllDeletedFilteredSortedNotes({ sortBy, order: sortOrder, is_deleted: true, is_archived: false });
+    } else if (page === "ARCHIVE") {
+      getAllArchivedFilteredSortedNotes({ sortBy, order: sortOrder, is_archived: true, is_deleted: false });
+    } else if (page === categoryName) {
+      getFilteredSortedNotes({ sortBy, order: sortOrder, category: categoryName });
+    } else {
       getFilteredSortedNotes({ sortBy, order: sortOrder });
     }
 
@@ -36,10 +31,9 @@ const ToolBar = ({ page }) => {
       JSON.stringify({
         sortBy,
         order: sortOrder,
-        page
+        page,
       })
     );
-
   }, [sortBy, sortOrder, categoryName, page]);
 
   useEffect(() => {
@@ -91,10 +85,11 @@ const ToolBar = ({ page }) => {
                 ).map((field) => (
                   <div
                     key={field}
-                    className={`cursor-pointer px-2 py-1 rounded transition flex justify-between ${sortBy === field
-                      ? "bg-amber-200 text-amber-800 font-semibold"
-                      : "hover:bg-amber-100 hover:text-amber-600"
-                      }`}
+                    className={`cursor-pointer px-2 py-1 rounded transition flex justify-between ${
+                      sortBy === field
+                        ? "bg-amber-200 text-amber-800 font-semibold"
+                        : "hover:bg-amber-100 hover:text-amber-600"
+                    }`}
                     onClick={() => handleSort(field)}
                   >
                     <span className="capitalize">
@@ -105,15 +100,11 @@ const ToolBar = ({ page }) => {
                     <span className="font-bold ml-2">{renderArrow(field)}</span>
                   </div>
                 ))}
-
               </div>
             )}
           </div>
 
-          <CiFilter
-            size={26}
-            className="cursor-pointer hover:scale-110 transition"
-          />
+          <CiFilter size={26} className="cursor-pointer hover:scale-110 transition" />
         </div>
       </div>
 
