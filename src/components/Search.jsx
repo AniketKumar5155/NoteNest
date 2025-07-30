@@ -4,7 +4,6 @@ import SearchIcon from '@mui/icons-material/Search';
 import { useNotes } from '../context/NoteContext';
 
 const Search = () => {
-
   const { searchQuery, setSearchQuery } = useNotes();
 
   return (
@@ -15,21 +14,20 @@ const Search = () => {
       value={searchQuery}
       onChange={(e) => setSearchQuery(e.target.value)}
       sx={{
-        fontSize: '24px',
-        fontWeight: 'bold',
         minWidth: 250,
         flex: 1,
         maxWidth: 700,
         px: 2,
         '& .MuiOutlinedInput-root': {
           height: 40,
-          fontSize: '14px',
           '&.Mui-focused fieldset': {
             borderColor: '#d97706',
           },
         },
         '& input': {
           padding: '10px 12px',
+          fontSize: '16px',        // Increased font size
+          fontWeight: '600',       // Made text bolder
         },
         '& .MuiSvgIcon-root': {
           fontSize: 20,

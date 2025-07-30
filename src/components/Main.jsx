@@ -3,6 +3,7 @@ import AddNote from "./AddNote";
 import NoteCard from "./NoteCard";
 import { useNotes } from "../context/NoteContext";
 import useDebounce from "../hooks/useDebounce";
+import Fuse from "fuse.js";
 
 const Main = ({
   filter = "active",
@@ -21,11 +22,29 @@ const Main = ({
 
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  const visibleNotes = notes.filter((note) => note.title.toLowerCase().includes(debouncedSearch.toLowerCase()));
+  const fuse = new Fuse(notes, {
+    keys: ["title", "content"],
+    includeScore: true,
+    threshold: 0.4,
+    ignoreLocation: true,
+    includeMatches: true,
+  });
 
   const notesToRender = debouncedSearch.trim()
-    ? visibleNotes
+    ? fuse.search(debouncedSearch).map(result => result.item)
     : notes;
+
+
+
+  // const visibleNotes = notes.filter(note =>
+  //   note.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //   note.content.toLowerCase().includes(searchQuery.toLowerCase())
+  // );
+
+  // const notesToRender = debouncedSearch.trim()
+  //   ? visibleNotes
+  //   : notes;
+
 
   useEffect(() => {
     const filters = {
