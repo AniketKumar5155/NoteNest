@@ -30,9 +30,11 @@ const Main = ({
     includeMatches: true,
   });
 
-  const notesToRender = debouncedSearch.trim()
-    ? fuse.search(debouncedSearch).map(result => result.item)
-    : notes;
+ const notesToRender = debouncedSearch.trim()
+  ? fuse.search(debouncedSearch)
+      .sort((a, b) => a.score - b.score)
+      .map(result => result.item)
+  : notes;
 
 
 
