@@ -1,123 +1,115 @@
-import NoteEditorHeader from "./NoteEditorHeader";
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
+import NoteEditorHeader from "../components/NoteEditorHeader";
 import { FaSave } from "react-icons/fa";
 import { RiArrowGoBackFill } from "react-icons/ri";
-import {
-  createNoteService,
-  getNoteByIdService,
-  updateNoteService,
-} from "../service/noteService";
-import { useEffect, useState } from "react";
+import { getNoteByIdService, createNoteService, updateNoteService } from "../service/noteService";
 import { toast } from "react-toastify";
-import { useParams, useNavigate } from "react-router-dom";
+import useMediaQuery from "../hooks/useMediaQuery";
 
 const Notes = () => {
-  const navigate = useNavigate();
   const { id } = useParams();
+  const navigate = useNavigate();
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const getNoteById = async () => {
+  useEffect(() => {
+    if (!id) {
+      setTitle("");
+      setContent("");
+      return;
+    }
+    const fetchNote = async () => {
+      try {
+        const noteData = await getNoteByIdService(id);
+        setTitle(noteData.title);
+        setContent(noteData.content);
+      } catch (error) {
+        toast.error("Failed to fetch note");
+      }
+    };
+    fetchNote();
+  }, [id]);
+
+  const handleSave = async () => {
+    if (!title.trim()) {
+      toast.error("Title is required");
+      return;
+    }
+
+    setLoading(true);
     try {
-      const noteData = await getNoteByIdService(id);
-      setTitle(noteData.title);
-      setContent(noteData.content);
+      if (id) {
+        const noteData = await updateNoteService(id, { title, content });
+        setTitle(noteData.title);
+        setContent(noteData.content);
+        toast.success("Note saved");
+      } else {
+        const newNote = await createNoteService({ title, content });
+        if (isDesktop) {
+          navigate(`/notes/${newNote.id}`);
+        } else {
+          navigate(`/note/${newNote.id}`);
+        }
+        toast.success("Note created");
+      }
     } catch (error) {
-      toast.error("Ek note nahi fetch ho paa raha hain");
+      toast.error("Notes can't be edited in bin");
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
-    if (id) {
-      getNoteById();
-    }
-  }, []);
-const handleSave = async () => {
-  if (!title.trim()) {
-    toast.error("Title is required");
-    return;
-  }
-
-  setLoading(true);
-  try {
-    if (id) {
-      const noteData = await updateNoteService(id, { title, content });
-      setTitle(noteData.title);
-      setContent(noteData.content);
-      toast.success("Note saved");
-    } else {
-
-      const newNote = await createNoteService({title, content,});
-      const newId = newNote.id;
-      navigate(`/note/${newId}`);
-      toast.success("Note Created");
-    }
-  } catch (error) {
-    console.error("Error saving or fetching note:", error); 
-    toast.error("Failed to save");
-  } finally {
-    setLoading(false);
-  }
-};
-
-
   return (
     <div className="h-screen flex flex-col">
-      <div className="flex-shrink-0">
-        <NoteEditorHeader />
-        <div className="flex items-center gap-2 bg-amber-100 h-10 p-2">
-          <input
-            type="text"
-            name="title"
-            placeholder="Title"
-            className="w-full bg-amber-100 h-full focus:outline-none focus:ring-0 focus:border-none text-lg font-semibold"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-          />
+      <NoteEditorHeader />
 
-          <button
-            disabled={loading}
-            onClick={() => toast.info("Undo functionality coming soon")}
-            className={`
-              flex items-center gap-1 px-3 py-2 rounded-md text-white 
-              text-sm font-medium transition-all duration-200
-              ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"}
-            `}
-          >
-            <RiArrowGoBackFill className="w-4 h-4" />
-            Undo
-          </button>
+      <div className="flex items-center gap-2 bg-amber-100 h-10 p-2 flex-shrink-0">
+        <input
+          type="text"
+          name="title"
+          placeholder="Title"
+          className="w-full bg-amber-100 h-full focus:outline-none focus:ring-0 focus:border-none text-lg font-semibold"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
 
-          <button
-            onClick={async () => {
-              if (loading || !title.trim()) return;
-              await handleSave();
-            }}
-            disabled={loading || !title.trim()}
-            className={`
-              flex items-center gap-1 px-3 py-2 rounded-md text-white 
-              text-sm font-medium transition-all duration-200
-              ${loading || !title.trim()
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-green-500 hover:bg-green-600"}
-            `}
-          >
-            <FaSave className="w-4 h-4" />
-            {loading ? "Saving..." : "Save"}
-          </button>
-        </div>
+        <button
+          disabled={loading}
+          onClick={() => toast.info("Undo functionality coming soon")}
+          className={`flex items-center gap-1 px-3 py-2 rounded-md text-white text-sm font-medium transition-all duration-200 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
+            }`}
+        >
+          <RiArrowGoBackFill className="w-4 h-4" />
+          Undo
+        </button>
+
+        <button
+          onClick={async () => {
+            if (loading || !title.trim()) return;
+            await handleSave();
+          }}
+          disabled={loading || !title.trim()}
+          className={`flex items-center gap-1 px-3 py-2 rounded-md text-white text-sm font-medium transition-all duration-200 ${loading || !title.trim()
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-green-500 hover:bg-green-600"
+            }`}
+        >
+          <FaSave className="w-4 h-4" />
+          {loading ? "Saving..." : "Save"}
+        </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto min-h-0">
-        <textarea
-          name="content"
-          placeholder="Content"
-          className="block w-full h-full px-2 py-2 bg-amber-200 focus:outline-none focus:ring-0 focus:border-none resize-none leading-tight"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-        ></textarea>
-      </div>
+      <textarea
+        name="content"
+        placeholder="Content"
+        className="block w-full h-full px-2 py-2 bg-amber-200 focus:outline-none focus:ring-0 focus:border-none resize-none leading-tight flex-1"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+      />
     </div>
   );
 };

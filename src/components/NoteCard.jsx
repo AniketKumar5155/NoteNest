@@ -1,12 +1,16 @@
 import { MdDelete, MdRestore, MdUnarchive, MdArchive } from "react-icons/md";
-import { Link, useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useNotes } from "../context/NoteContext";
 import { toast } from "react-toastify";
 import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import CategoryModal from "./CategoryModal";
+import useMediaQuery from "../hooks/useMediaQuery";
 
 const NoteCard = ({ id, title }) => {
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const navigate = useNavigate();
+
   const {
     softDeleteNote,
     deleteNote,
@@ -14,19 +18,15 @@ const NoteCard = ({ id, title }) => {
     unarchiveNote,
     archiveNote,
   } = useNotes();
-  
-  const location = useLocation();
 
+  const location = useLocation();
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
   const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
 
-  const handleThreeDotMenu = () => {
-    setIsOpen(!isOpen);
-  };
+  const handleThreeDotMenu = () => setIsOpen(!isOpen);
 
- 
   const noteStatus = () => {
     if (location.pathname.includes("bin")) return "deleted";
     if (location.pathname.includes("archive")) return "archived";
@@ -97,11 +97,33 @@ const NoteCard = ({ id, title }) => {
     }
   };
 
+  const handleNoteClick = () => {
+    const path = location.pathname;
+
+    if (isDesktop) {
+      if (path.startsWith("/archive")) {
+        navigate(`/archive/notes/${id}`);
+      } else if (path.startsWith("/bin")) {
+        navigate(`/bin/notes/${id}`);
+      } else if (path.startsWith("/note/category")) {
+        const [_, __, ___, categoryName] = path.split("/");
+        navigate(`/note/category/${categoryName}/${id}`);
+
+      } else {
+        navigate(`/notes/${id}`);
+      }
+    } else {
+      navigate(`/note/${id}`); // Unified route for mobile
+    }
+  };
+
+
+
   return (
     <div className="relative flex justify-between items-center p-4 bg-amber-300 rounded mx-5 hover:bg-amber-400 transition-colors overflow-visible">
-      <Link to={`/note/${id}`} className="flex-1">
+      <div onClick={handleNoteClick} className="flex-1 cursor-pointer">
         <p className="text-lg font-medium break-words whitespace-normal">{title}</p>
-      </Link>
+      </div>
 
       {status === "deleted" && (
         <MdRestore
@@ -141,19 +163,16 @@ const NoteCard = ({ id, title }) => {
       />
 
       <BsThreeDotsVertical
-      onClick={handleThreeDotMenu}
+        onClick={handleThreeDotMenu}
         className="h-5 w-5 cursor-pointer hover:text-gray-600 relative z-10"
       />
 
       {isOpen && (
-        <div
-          className="absolute right-4 top-12 bg-white border rounded shadow-md z-50 text-sm w-40"
-        >
+        <div className="absolute right-4 top-12 bg-white border rounded shadow-md z-50 text-sm w-40">
           {status === "active" && (
             <>
               <div
                 onClick={handleArchive}
-                disabled={loading}
                 className="block w-full px-4 py-2 text-left hover:bg-gray-100"
               >
                 Archive
@@ -163,7 +182,6 @@ const NoteCard = ({ id, title }) => {
                   setShowCategoryModal(true);
                   setIsOpen(false);
                 }}
-                disabled={loading}
                 className="block w-full px-4 py-2 text-left hover:bg-gray-100"
               >
                 Category
@@ -174,7 +192,6 @@ const NoteCard = ({ id, title }) => {
           {status === "archived" && (
             <div
               onClick={handleUnarchive}
-              disabled={loading}
               className="block w-full px-4 py-2 text-left hover:bg-gray-100"
             >
               Unarchive
@@ -184,7 +201,6 @@ const NoteCard = ({ id, title }) => {
           {status === "deleted" && (
             <div
               onClick={handleRestore}
-              disabled={loading}
               className="block w-full px-4 py-2 text-left hover:bg-gray-100"
             >
               Restore
@@ -200,7 +216,6 @@ const NoteCard = ({ id, title }) => {
               }
               setIsOpen(false);
             }}
-            disabled={loading}
             className="block w-full px-4 py-2 text-left hover:bg-gray-100 text-red-500"
           >
             {status === "deleted" ? "Delete Permanently" : "Move to Bin"}
@@ -218,14 +233,12 @@ const NoteCard = ({ id, title }) => {
             <div
               onClick={() => setConfirmingDeleteId(null)}
               className="text-sm px-3 py-1 bg-gray-200 hover:bg-gray-300 rounded"
-              disabled={loading}
             >
               Cancel
             </div>
             <div
               onClick={handleDelete}
               className="text-sm px-3 py-1 bg-red-500 text-white hover:bg-red-600 rounded"
-              disabled={loading}
             >
               Delete
             </div>

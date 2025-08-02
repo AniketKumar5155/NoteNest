@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import AddNote from "./AddNote";
+// import AddNote from "./AddNote";
 import NoteCard from "./NoteCard";
 import { useNotes } from "../context/NoteContext";
 import useDebounce from "../hooks/useDebounce";
@@ -30,11 +30,11 @@ const Main = ({
     includeMatches: true,
   });
 
- const notesToRender = debouncedSearch.trim()
-  ? fuse.search(debouncedSearch)
+  const notesToRender = debouncedSearch.trim()
+    ? fuse.search(debouncedSearch)
       .sort((a, b) => a.score - b.score)
       .map(result => result.item)
-  : notes;
+    : notes;
 
 
 
@@ -61,12 +61,12 @@ const Main = ({
     } else if (categoryName) {
       getFilteredSortedNotes({ ...filters, category: categoryName });
     } else {
-      getFilteredSortedNotes(filters);
+      getFilteredSortedNotes({...filters});
     }
   }, [filter, sortBy, sortOrder, categoryName]);
 
   return (
-    <div className="flex-1 overflow-y-auto gap-1 flex flex-col pt-1 pb-36 bg-[#ffefad]">
+    <div className="flex-1 relative overflow-y-auto gap-1 flex flex-col pt-1 pb-36 bg-[#ffefad] min-h-screen ">
       {loading ? (
         <p className="text-center text-gray-600">Loading notes...</p>
       ) : notesToRender.length === 0 ? (
@@ -81,8 +81,6 @@ const Main = ({
           />
         ))
       )}
-
-      {filter === "active" && <AddNote />}
     </div>
   );
 };

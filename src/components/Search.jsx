@@ -36,7 +36,9 @@ const Search = () => {
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
+            <div className='cursor-pointer'>
             <SearchIcon />
+            </div>
           </InputAdornment>
         ),
       }}

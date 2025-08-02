@@ -7,7 +7,7 @@ const ProtectedRoute = ({ children }) => {
   const isLoading = localStorage.getItem("accessToken") && auth.user === null;
 
   if (isLoading) {
-    return <div>Loading...</div>; // optional loader
+    return <div>Loading...</div>;
   }
 
   if (!auth.user) {

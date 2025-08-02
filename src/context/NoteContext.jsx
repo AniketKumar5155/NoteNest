@@ -29,6 +29,7 @@ export const NoteProvider = ({ children }) => {
   const [filters, setFilters] = useState({ sortBy: "created_at", order: "DESC" });
   const [searchQuery, setSearchQuery] = useState("");
   const [lastFilters, setLastFilters] = useState({});
+  const [selectedNote, setSelectedNote] = useState(null)
 
   const createNote = async ({ title, content }) => {
     try {
@@ -211,6 +212,11 @@ export const NoteProvider = ({ children }) => {
     }
   };
 
+  const selectNote = () => {
+    const note = (notes.find(note => note.id === id))
+    setSelectedNote(note || null)
+  }
+
   useEffect(() => {
     if (user) {
       getFilteredSortedNotes(filters);
@@ -241,6 +247,9 @@ export const NoteProvider = ({ children }) => {
         updateCatgory,
         searchQuery,
         setSearchQuery,
+        selectedNote,
+        setSelectedNote,
+        selectNote
       }}
     >
       {children}

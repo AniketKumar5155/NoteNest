@@ -1,12 +1,15 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams } from "react-router-dom";
-import { CiFilter } from "react-icons/ci";
 import { MdOutlineSort } from "react-icons/md";
 import Search from "./Search";
 import { useNotes } from "../context/NoteContext";
+import AddNote from "./AddNote";
+import { useNavigate } from "react-router-dom";
 
 const ToolBar = ({ page }) => {
   const sortRef = useRef(null);
+
+  const navigate = useNavigate();
 
   const [sortBy, setSortBy] = useState(() => localStorage.getItem("sortBy") || "created_at");
   const [sortOrder, setSortOrder] = useState(() => localStorage.getItem("sortOrder") || "DESC");
@@ -15,6 +18,14 @@ const ToolBar = ({ page }) => {
 
   const { categoryName } = useParams();
 
+  const handleClick = () => {
+    const isDesktop = window.innerWidth >= 1024;
+    if (isDesktop) {
+      navigate("/notes/create"); // Shows editor in side panel
+    } else {
+      navigate("/create"); // Full-screen on mobile
+    }
+  };
   useEffect(() => {
     if (page === "BIN") {
       getAllDeletedFilteredSortedNotes({ sortBy, order: sortOrder, is_deleted: true, is_archived: false });
@@ -62,34 +73,37 @@ const ToolBar = ({ page }) => {
 
   return (
     <>
+      {/* Toolbar */}
       <div className="bg-amber-400 flex justify-between items-center px-3 shadow-md h-[64px]">
-        <Search />
+        {/* Left: Search */}
+        <div className="flex items-center gap-3">
+          <Search />
+        </div>
 
-        <div className="flex items-center gap-4 pr-3 relative">
+        {/* Right: Sort & Add */}
+        <div className="flex items-center gap-4 relative">
+          {/* Sort Icon & Dropdown */}
           <div ref={sortRef} className="relative">
             <MdOutlineSort
               size={26}
               className="cursor-pointer hover:scale-110 transition"
               onClick={() => setIsSortOpen((prev) => !prev)}
             />
-
             {isSortOpen && (
               <div className="absolute top-9 right-0 bg-white shadow-lg border rounded-xl z-20 w-48 p-3 space-y-2">
                 <h1 className="text-center text-gray-700 font-semibold border-b pb-2">
                   Sort by
                 </h1>
-
                 {(page === "BIN"
                   ? ["deleted_at", "created_at", "updated_at", "title"]
                   : ["created_at", "updated_at", "title"]
                 ).map((field) => (
                   <div
                     key={field}
-                    className={`cursor-pointer px-2 py-1 rounded transition flex justify-between ${
-                      sortBy === field
-                        ? "bg-amber-200 text-amber-800 font-semibold"
-                        : "hover:bg-amber-100 hover:text-amber-600"
-                    }`}
+                    className={`cursor-pointer px-2 py-1 rounded transition flex justify-between ${sortBy === field
+                      ? "bg-amber-200 text-amber-800 font-semibold"
+                      : "hover:bg-amber-100 hover:text-amber-600"
+                      }`}
                     onClick={() => handleSort(field)}
                   >
                     <span className="capitalize">
@@ -104,15 +118,18 @@ const ToolBar = ({ page }) => {
             )}
           </div>
 
-          <CiFilter size={26} className="cursor-pointer hover:scale-110 transition" />
+          {/* Add Note Button */}
+          <AddNote onClick={handleClick} />
         </div>
       </div>
 
+      {/* Page Title */}
       <div className="flex items-center justify-center bg-[#ffefad]">
         <h1 className="font-bold text-[25px] underline">{page}</h1>
       </div>
     </>
   );
+
 };
 
 export default ToolBar;
