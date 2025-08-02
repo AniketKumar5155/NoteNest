@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Button from "./Button";
-import InputField from "./InputField";
+import Button from "../components/Button";
+import InputField from "../components/InputField";
 import { loginSchema } from "../shared/schemas/authSchemas";
 import { toast } from "react-toastify";
 import { useAuth } from "../context/AuthContext";
@@ -18,7 +18,6 @@ const LoginForm = () => {
   };
 
   const handleLogin = async (e) => {
-    // console.log("Form data before login:", formData);
     e.preventDefault();
     try {
       const validated = loginSchema.parse(formData);

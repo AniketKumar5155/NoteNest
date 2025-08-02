@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { toast } from "react-toastify";
 import { useNotes } from "../context/NoteContext";
+import useMediaQuery from "../hooks/useMediaQuery";
 import { useParams } from "react-router-dom";
 
 const NoteEditorHeader = () => {
@@ -13,8 +14,10 @@ const NoteEditorHeader = () => {
 
     const { archiveNote, getNoteById } = useNotes();
 
+    const isDesktop = useMediaQuery("(min-width: 1024px)");
+
     const handleThreeDotMenu = () => {
-        setIsOpen(!isOpen);
+        setIsOpen((!isOpen));
     };
 
     useEffect(() => {
@@ -60,9 +63,9 @@ const NoteEditorHeader = () => {
                 <IoMdArrowRoundBack className="h-5 w-5" />
             </Link>
 
-            <div className="font-bold text-2xl">
+            {!isDesktop ? <div className="font-bold text-2xl">
                 NoteNest
-            </div>
+            </div> : null}
 
             <div className="relative" ref={menuRef}>
                 <BsThreeDotsVertical

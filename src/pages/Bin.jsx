@@ -1,14 +1,33 @@
-import Main from "../components/Main";
 import ToolBar from "../components/ToolBar";
+import Main from "../components/Main";
+import Notes from "../components/Notes";
+import useMediaQuery from "../hooks/useMediaQuery";
+import Header from "../components/Header";
+import { Outlet } from "react-router";
 
 const Bin = () => {
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
   return (
-    <div className="flex flex-col h-screen">
-        <ToolBar page="BIN" />
-      <div className="flex-1 overflow-y-auto bg-[#ffefad]">
-        <Main filter="deleted" />
+    <>
+    <div className="flex h-screen flex-col lg:flex-row">
+      <div className="w-full lg:w-[30%] flex flex-col h-full">
+      <Header/>
+        <div className="h-auto lg:h-[30%]">
+          <ToolBar page= "BIN"/>
+        </div>
+        <div className="flex-1 min-h-screen bg-[#ffefad] overflow-y-auto">
+          <Main filter = "deleted"/>
+        </div>
       </div>
+
+      {isDesktop && (
+        <div className="w-full lg:w-[70%] h-full overflow-y-auto">
+          <Outlet />
+        </div>
+      )}
     </div>
+    </>
   );
 };
 
