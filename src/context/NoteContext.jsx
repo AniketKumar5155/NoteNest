@@ -35,7 +35,7 @@ export const NoteProvider = ({ children }) => {
     try {
       await createNoteService({ title, content });
       getFilteredSortedNotes(lastFilters);
-    } catch (err) {
+    } catch (error) {
       toast.error("Failed to create note");
     }
   };
@@ -44,7 +44,7 @@ export const NoteProvider = ({ children }) => {
     try {
       await updateNoteService(id, updatedData);
       getFilteredSortedNotes(lastFilters);
-    } catch (err) {
+    } catch (error) {
       toast.error("Failed to update note");
     }
   };

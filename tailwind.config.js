@@ -1,6 +1,13 @@
 // tailwind.config.js
 module.exports = {
   content: ["./index.html", "./src/**/*.{js,jsx}"],
+ safelist: [
+  {
+    pattern: /^(hover:)?bg-(red|orange|amber|yellow|green|blue|indigo|purple|pink|brown|gray|black|cyan|lime|teal)-(100|200|300|400|500|600|700|800|900)$/,
+    variants: ['hover'],
+  },
+],
+
   theme: {
     extend: {
       animation: {
