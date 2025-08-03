@@ -3,9 +3,10 @@ import { useParams, useNavigate } from "react-router-dom";
 import NoteEditorHeader from "../components/NoteEditorHeader";
 import { FaSave } from "react-icons/fa";
 import { RiArrowGoBackFill } from "react-icons/ri";
-import { getNoteByIdService, createNoteService, updateNoteService } from "../service/noteService";
+import { getNoteByIdService } from "../service/noteService";
 import { toast } from "react-toastify";
 import useMediaQuery from "../hooks/useMediaQuery";
+import { useNotes } from "../context/NoteContext";
 
 const Notes = () => {
   const { id } = useParams();
@@ -15,6 +16,8 @@ const Notes = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
+
+  const  { createNote, updateNote } = useNotes();
 
   useEffect(() => {
     if (!id) {
@@ -43,12 +46,12 @@ const Notes = () => {
     setLoading(true);
     try {
       if (id) {
-        const noteData = await updateNoteService(id, { title, content });
+        const noteData = await updateNote(id, { title, content });
         setTitle(noteData.title);
         setContent(noteData.content);
         toast.success("Note saved");
       } else {
-        const newNote = await createNoteService({ title, content });
+        const newNote = await createNote({ title, content });
         if (isDesktop) {
           navigate(`/notes/${newNote.id}`);
         } else {

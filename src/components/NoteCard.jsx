@@ -6,8 +6,9 @@ import { useState } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import CategoryModal from "./CategoryModal";
 import useMediaQuery from "../hooks/useMediaQuery";
+import ColorModal from "./ColorModal";
 
-const NoteCard = ({ id, title }) => {
+const NoteCard = ({ id, title, color, shade }) => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const navigate = useNavigate();
 
@@ -23,6 +24,7 @@ const NoteCard = ({ id, title }) => {
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [showCategoryModal, setShowCategoryModal] = useState(false);
+  const [showColorModal, setShowColorModal] = useState(false);
   const [confirmingDeleteId, setConfirmingDeleteId] = useState(null);
 
   const handleThreeDotMenu = () => setIsOpen(!isOpen);
@@ -113,14 +115,16 @@ const NoteCard = ({ id, title }) => {
         navigate(`/notes/${id}`);
       }
     } else {
-      navigate(`/note/${id}`); // Unified route for mobile
+      navigate(`/note/${id}`);
     }
   };
 
-
+  const bgColorClass = `bg-${color}-${shade}`;
+  const hoverClass = `hover:bg-${color}-${Math.min(+shade + 100, 900)}`;
 
   return (
-    <div className="relative flex justify-between items-center p-4 bg-amber-300 rounded mx-5 hover:bg-amber-400 transition-colors overflow-visible">
+    <div className={`relative flex justify-between items-center p-4 rounded mx-5 transition-colors overflow-visible ${bgColorClass} ${hoverClass} `}>
+
       <div onClick={handleNoteClick} className="flex-1 cursor-pointer">
         <p className="text-lg font-medium break-words whitespace-normal">{title}</p>
       </div>
@@ -173,7 +177,7 @@ const NoteCard = ({ id, title }) => {
             <>
               <div
                 onClick={handleArchive}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                className="block w-full px-4 py-2 text-left cursor-pointer hover:bg-gray-100"
               >
                 Archive
               </div>
@@ -182,9 +186,18 @@ const NoteCard = ({ id, title }) => {
                   setShowCategoryModal(true);
                   setIsOpen(false);
                 }}
-                className="block w-full px-4 py-2 text-left hover:bg-gray-100"
+                className="block w-full px-4 py-2 text-left cursor-pointer hover:bg-gray-100"
               >
                 Category
+              </div>
+              <div
+                onClick={() => {
+                  setShowColorModal(true);
+                  setIsOpen(false);
+                }}
+                className="block w-full px-4 py-2 text-left cursor-pointer hover:bg-gray-100"
+              >
+                Color
               </div>
             </>
           )}
@@ -250,6 +263,14 @@ const NoteCard = ({ id, title }) => {
         <CategoryModal
           noteId={id}
           onClose={() => setShowCategoryModal(false)}
+        />
+      )}
+
+      {showColorModal && (
+        <ColorModal
+          noteId={id}
+          onClose={() => setShowColorModal(false)}
+          onClickClose={() => setShowColorModal(false)}
         />
       )}
     </div>
