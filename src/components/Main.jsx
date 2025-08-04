@@ -54,7 +54,7 @@ const Main = ({
   }, [filter, sortBy, sortOrder, categoryName]);
 
   return (
-    <div className="flex-1 relative overflow-y-auto bg-[#ffefad] min-h-screen pb-30 pt-2 px-2">
+    <div className="flex-1 relative overflow-y-auto bg-[#ffefad] min-h-screen pb-30 pt-2 px-2  ">
       {loading ? (
         <p className="text-center text-gray-600">Loading notes...</p>
       ) : notesToRender.length === 0 ? (

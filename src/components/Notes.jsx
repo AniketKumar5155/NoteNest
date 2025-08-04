@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import NoteEditorHeader from "../components/NoteEditorHeader";
 import { FaSave } from "react-icons/fa";
 import { RiArrowGoBackFill } from "react-icons/ri";
-import { getNoteByIdService } from "../service/noteService";
 import { toast } from "react-toastify";
 import useMediaQuery from "../hooks/useMediaQuery";
 import { useNotes } from "../context/NoteContext";
+import { MdRestore } from "react-icons/md";
 
 const Notes = () => {
   const { id } = useParams();
@@ -16,8 +16,10 @@ const Notes = () => {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(false);
+  const [noteStatus, setnoteStatus] = useState("active")
 
-  const  { createNote, updateNote } = useNotes();
+  const { createNote, updateNote, getNoteById, restoreDeletedNote } = useNotes();
+
 
   useEffect(() => {
     if (!id) {
@@ -27,9 +29,11 @@ const Notes = () => {
     }
     const fetchNote = async () => {
       try {
-        const noteData = await getNoteByIdService(id);
+        const noteData = await getNoteById(id);
         setTitle(noteData.title);
         setContent(noteData.content);
+        setnoteStatus(noteData.status || "active")
+        console.log(noteStatus)
       } catch (error) {
         toast.error("Failed to fetch note");
       }
@@ -42,6 +46,11 @@ const Notes = () => {
       toast.error("Title is required");
       return;
     }
+
+    // if (noteStatus === "deleted"){
+    //   toast.error("Notes can't be edited in bin")
+    //   return;
+    // }
 
     setLoading(true);
     try {
@@ -66,54 +75,81 @@ const Notes = () => {
     }
   };
 
+  const handleRestore = async () => {
+    try{
+      await restoreDeletedNote(id)
+      toast.success("Note restored successfully")
+    }catch(error){
+      console.log(error)
+      toast.error("Failed to restore notes")
+    }
+  }
+
+
+
   return (
-    <div className="h-screen flex flex-col">
-      <NoteEditorHeader />
+    <>
+      <div className="h-screen flex flex-col">
+        <NoteEditorHeader />
 
-      <div className="flex items-center gap-2 bg-amber-100 h-10 p-2 flex-shrink-0">
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          className="w-full bg-amber-100 h-full focus:outline-none focus:ring-0 focus:border-none text-lg font-semibold"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+        <div className="flex items-center gap-2 bg-amber-100 h-10 p-2 flex-shrink-0">
+          <input
+            type="text"
+            name="title"
+            placeholder="Title"
+            className="w-full bg-amber-100 h-full focus:outline-none focus:ring-0 focus:border-none text-lg font-semibold"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+          />
+
+          {noteStatus !== "deleted" ? (
+            <>
+              <button
+                disabled={loading}
+                onClick={() => toast.info("Undo functionality coming soon")}
+                className={`flex items-center gap-1 px-3 py-2 rounded-md text-white text-sm font-medium transition-all duration-200 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
+                  }`}
+              >
+                <RiArrowGoBackFill className="w-4 h-4" />
+                Undo
+              </button>
+
+              <button
+                onClick={async () => {
+                  if (loading || !title.trim()) return;
+                  await handleSave();
+                }}
+                disabled={loading || !title.trim()}
+                className={`flex items-center gap-1 px-3 py-2 rounded-md text-white text-sm font-medium transition-all duration-200 ${loading || !title.trim()
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-500 hover:bg-green-600"
+                  }`}
+              >
+                <FaSave className="w-4 h-4" />
+                {loading ? "Saving..." : "Save"}
+              </button>
+            </>) : <div>
+            <button
+              disabled={loading}
+              onClick={()=>handleRestore()}
+              className={`flex items-center gap-1 px-3 py-2 rounded-md text-white text-sm font-medium transition-all duration-200 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
+                }`}
+            >
+              <MdRestore className="w-4 h-4" />
+              Restore
+            </button>
+          </div>}
+        </div>
+
+        <textarea
+          name="content"
+          placeholder="Content"
+          className="block w-full h-full px-2 py-2 bg-amber-200 focus:outline-none focus:ring-0 focus:border-none resize-none leading-tight flex-1"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
         />
-
-        <button
-          disabled={loading}
-          onClick={() => toast.info("Undo functionality coming soon")}
-          className={`flex items-center gap-1 px-3 py-2 rounded-md text-white text-sm font-medium transition-all duration-200 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
-            }`}
-        >
-          <RiArrowGoBackFill className="w-4 h-4" />
-          Undo
-        </button>
-
-        <button
-          onClick={async () => {
-            if (loading || !title.trim()) return;
-            await handleSave();
-          }}
-          disabled={loading || !title.trim()}
-          className={`flex items-center gap-1 px-3 py-2 rounded-md text-white text-sm font-medium transition-all duration-200 ${loading || !title.trim()
-              ? "bg-gray-400 cursor-not-allowed"
-              : "bg-green-500 hover:bg-green-600"
-            }`}
-        >
-          <FaSave className="w-4 h-4" />
-          {loading ? "Saving..." : "Save"}
-        </button>
       </div>
-
-      <textarea
-        name="content"
-        placeholder="Content"
-        className="block w-full h-full px-2 py-2 bg-amber-200 focus:outline-none focus:ring-0 focus:border-none resize-none leading-tight flex-1"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
-    </div>
+    </>
   );
 };
 

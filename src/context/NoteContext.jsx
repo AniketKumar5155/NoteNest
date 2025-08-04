@@ -15,6 +15,7 @@ import {
   getAllActiveCategoriesService,
   updateCategoryService,
   getAllDeletedFilteredSortedNotesService,
+  updateNoteColorAndShadeService,
 } from "../service/noteService";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
@@ -51,6 +52,7 @@ export const NoteProvider = ({ children }) => {
 
   const getNoteById = async (id) => {
     try {
+      console.log("jskegrjdkvfndsmcmnagxvfzmndaslkjzfl;dkjcxb", getNoteByIdService(id))
       return await getNoteByIdService(id);
     } catch (err) {
       toast.error("Failed to get note");
@@ -217,6 +219,17 @@ export const NoteProvider = ({ children }) => {
     setSelectedNote(note || null)
   }
 
+  const updateNoteColorAndShade = async (id, colorAndShade) => {
+    try {
+      await updateNoteColorAndShadeService(id, colorAndShade);
+      getFilteredSortedNotes(lastFilters);
+      toast.success("Note color applied successfully")
+    } catch (error) {
+      console.log(error)
+      toast.error("Failed to update color")
+    }
+  }
+
   useEffect(() => {
     if (user) {
       getFilteredSortedNotes(filters);
@@ -249,7 +262,8 @@ export const NoteProvider = ({ children }) => {
         setSearchQuery,
         selectedNote,
         setSelectedNote,
-        selectNote
+        selectNote,
+        updateNoteColorAndShade,
       }}
     >
       {children}

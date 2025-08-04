@@ -48,7 +48,7 @@ export const restoreDeletedNoteService = async (id) => {
 export const getFilteredSortedNotesService = async (filters = {}) => {
     const {
         sortBy = "created_at",
-        order = "DESC",       
+        order = "DESC",
         category,
         is_pinned,
     } = filters;
@@ -62,10 +62,10 @@ export const getFilteredSortedNotesService = async (filters = {}) => {
     return res.data.data;
 }
 
-export const getAllDeletedFilteredSortedNotesService = async (filters ={}) => {
+export const getAllDeletedFilteredSortedNotesService = async (filters = {}) => {
     const {
         sortBy = "deleted_at",
-        order = "DESC",       
+        order = "DESC",
         category,
         is_pinned,
         is_deleted = true,
@@ -80,7 +80,7 @@ export const getAllDeletedFilteredSortedNotesService = async (filters ={}) => {
         is_archived,
     }
 
-    const res = await axiosNoteInstance.get('/bin', {params});
+    const res = await axiosNoteInstance.get('/bin', { params });
     return res.data.data
 }
 
@@ -103,7 +103,7 @@ export const getAllArchivedFilteredSortedNotesService = async (filters = {}) => 
         is_archived,
     }
 
-    const res = await axiosNoteInstance.get('/archive', {params});
+    const res = await axiosNoteInstance.get('/archive', { params });
     return res.data.data
 }
 
@@ -119,6 +119,12 @@ export const updateCategoryService = async (id, name) => {
 
 export const getAllActiveCategoriesService = async () => {
     const res = await axiosNoteInstance.get('/active-categories');
+    return res.data.data;
+}
+
+export const updateNoteColorAndShadeService = async (id, data) => {
+    const res = await axiosNoteInstance.patch(`/${id}/update-color-shade`, data );
+    console.log(res.data.data)
     return res.data.data;
 }
 

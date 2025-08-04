@@ -123,7 +123,7 @@ const NoteCard = ({ id, title, color, shade }) => {
   const hoverClass = `hover:bg-${color}-${Math.min(+shade + 100, 900)}`;
 
   return (
-    <div className={`relative flex justify-between items-center p-4 rounded mx-5 transition-colors overflow-visible ${bgColorClass} ${hoverClass} `}>
+    <div className={`relative flex justify-between items-center p-4 rounded mx-5 transition-colors overflow-visible ${bgColorClass} ${hoverClass}`}>
 
       <div onClick={handleNoteClick} className="flex-1 cursor-pointer">
         <p className="text-lg font-medium break-words whitespace-normal">{title}</p>

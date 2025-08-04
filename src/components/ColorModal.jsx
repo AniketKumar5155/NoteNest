@@ -13,7 +13,7 @@ const ColorModal = ({ onClickClose, noteId }) => {
     const SHADES = ["100", "200", "300", "400", "500", "600", "700", "800", "900"];
 
 
-    const { notes, updateNote } = useNotes();
+    const { notes, updateNoteColorAndShade } = useNotes();
     const note = notes.find((n) => n.id === noteId);
     const [selectedColor, setSelectedColor] = useState(note?.color || "");
     const [showShadeOptions, setShowShadeOptions] = useState(false);
@@ -35,8 +35,8 @@ const ColorModal = ({ onClickClose, noteId }) => {
 
     const applyColor = async () => {
         try {
-            await updateNote(noteId, { color: selectedColor, shade: selectedShade })
-            toast.success("Note color applied successfully")
+            await updateNoteColorAndShade(noteId, { color: selectedColor, shade: selectedShade })
+            // toast.success("Note color applied successfully")
         } catch (error) {
             toast.error("Failed to apply Note color")
         }
