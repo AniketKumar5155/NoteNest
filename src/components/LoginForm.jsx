@@ -36,7 +36,6 @@ const LoginForm = () => {
     }
   };
 
-  const loginFormDEa =[FaUserEdit, late, hfhgxxk. kuj, jgbdj]
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
