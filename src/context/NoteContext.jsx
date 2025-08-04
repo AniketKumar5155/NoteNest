@@ -41,18 +41,19 @@ export const NoteProvider = ({ children }) => {
     }
   };
 
-  const updateNote = async (id, updatedData) => {
-    try {
-      await updateNoteService(id, updatedData);
-      getFilteredSortedNotes(lastFilters);
-    } catch (error) {
-      toast.error("Failed to update note");
-    }
-  };
+const updateNote = async (id, updatedData) => {
+  try {
+    const updatedNote = await updateNoteService(id, updatedData);
+    getFilteredSortedNotes(lastFilters);
+    return updatedNote;
+  } catch (error) {
+    toast.error("Failed to update note");
+  }
+};
+
 
   const getNoteById = async (id) => {
     try {
-      console.log("jskegrjdkvfndsmcmnagxvfzmndaslkjzfl;dkjcxb", getNoteByIdService(id))
       return await getNoteByIdService(id);
     } catch (err) {
       toast.error("Failed to get note");
@@ -225,7 +226,6 @@ export const NoteProvider = ({ children }) => {
       getFilteredSortedNotes(lastFilters);
       toast.success("Note color applied successfully")
     } catch (error) {
-      console.log(error)
       toast.error("Failed to update color")
     }
   }

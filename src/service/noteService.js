@@ -124,7 +124,6 @@ export const getAllActiveCategoriesService = async () => {
 
 export const updateNoteColorAndShadeService = async (id, data) => {
     const res = await axiosNoteInstance.patch(`/${id}/update-color-shade`, data );
-    console.log(res.data.data)
     return res.data.data;
 }
 
