@@ -32,9 +32,9 @@ const Notes = () => {
         const noteData = await getNoteById(id);
         setTitle(noteData.title);
         setContent(noteData.content);
-        setnoteStatus(noteData.status || "active")
-        console.log(noteStatus)
+        setnoteStatus(noteData.status || "active");
       } catch (error) {
+        console.error("Fetch error:", error);
         toast.error("Failed to fetch note");
       }
     };
@@ -44,6 +44,11 @@ const Notes = () => {
   const handleSave = async () => {
     if (!title.trim()) {
       toast.error("Title is required");
+      return;
+    }
+
+    if (noteStatus === "deleted") {
+      toast.error("Notes can't be edited in bin");
       return;
     }
 
@@ -69,23 +74,21 @@ const Notes = () => {
         toast.success("Note created");
       }
     } catch (error) {
-      toast.error("Notes can't be edited in bin");
+      console.error("Save error:", error);
+      toast.error("Failed to save note");
     } finally {
       setLoading(false);
     }
   };
 
   const handleRestore = async () => {
-    try{
+    try {
       await restoreDeletedNote(id)
       toast.success("Note restored successfully")
-    }catch(error){
-      console.log(error)
+    } catch (error) {
       toast.error("Failed to restore notes")
     }
   }
-
-
 
   return (
     <>
@@ -131,7 +134,7 @@ const Notes = () => {
             </>) : <div>
             <button
               disabled={loading}
-              onClick={()=>handleRestore()}
+              onClick={() => handleRestore()}
               className={`flex items-center gap-1 px-3 py-2 rounded-md text-white text-sm font-medium transition-all duration-200 ${loading ? "bg-gray-400 cursor-not-allowed" : "bg-yellow-500 hover:bg-yellow-600"
                 }`}
             >
@@ -148,6 +151,7 @@ const Notes = () => {
           value={content}
           onChange={(e) => setContent(e.target.value)}
         />
+
       </div>
     </>
   );
