@@ -80,8 +80,8 @@ const NoteEditorHeader = () => {
                         </div>
 
                         <div className="py-2">
-                            <div onClick={handleArchive} className="block px-4 py-2 hover:bg-gray-100">Archive</div>
-                            <div className="block px-4 py-2 hover:bg-gray-100">Bin</div>
+                            <div onClick={handleArchive} className="block px-4 py-2 hover:bg-gray-100 cursor-pointer">Archive</div>
+                            <div className="block px-4 py-2 hover:bg-gray-100 cursor-pointer">Bin</div>
                         </div>
                     </div>
                 )}

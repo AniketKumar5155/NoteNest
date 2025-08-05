@@ -16,6 +16,7 @@ import {
   updateCategoryService,
   getAllDeletedFilteredSortedNotesService,
   updateNoteColorAndShadeService,
+  deleteCategoryService,
 } from "../service/noteService";
 import { useAuth } from "./AuthContext";
 import { toast } from "react-toastify";
@@ -34,22 +35,23 @@ export const NoteProvider = ({ children }) => {
 
   const createNote = async ({ title, content }) => {
     try {
-      await createNoteService({ title, content });
+      const newNote = await createNoteService({ title, content });
       getFilteredSortedNotes(lastFilters);
+      return newNote
     } catch (error) {
       toast.error("Failed to create note");
     }
   };
 
-const updateNote = async (id, updatedData) => {
-  try {
-    const updatedNote = await updateNoteService(id, updatedData);
-    getFilteredSortedNotes(lastFilters);
-    return updatedNote;
-  } catch (error) {
-    toast.error("Failed to update note");
-  }
-};
+  const updateNote = async (id, updatedData) => {
+    try {
+      const updatedNote = await updateNoteService(id, updatedData);
+      getFilteredSortedNotes(lastFilters);
+      return updatedNote;
+    } catch (error) {
+      toast.error("Failed to update note");
+    }
+  };
 
 
   const getNoteById = async (id) => {
@@ -230,6 +232,19 @@ const updateNote = async (id, updatedData) => {
     }
   }
 
+  const deleteCategory = async (id) => {
+    try {
+      await deleteCategoryService(id);
+      getAllActiveCategories()
+      toast.success("Category deleted successfully")
+      setTimeout(() => {
+        toast.info("You can still found the notes in the homepage")
+      }, 500);
+    } catch (error) {
+      toast.error("Failed to delete category")
+    }
+  }
+
   useEffect(() => {
     if (user) {
       getFilteredSortedNotes(filters);
@@ -264,6 +279,7 @@ const updateNote = async (id, updatedData) => {
         setSelectedNote,
         selectNote,
         updateNoteColorAndShade,
+        deleteCategory,
       }}
     >
       {children}
