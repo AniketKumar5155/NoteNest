@@ -127,3 +127,8 @@ export const updateNoteColorAndShadeService = async (id, data) => {
     return res.data.data;
 }
 
+export const deleteCategoryService = async (id) => {
+    const res = await axiosNoteInstance.delete(`/${id}/category/delete`)
+    return res.data.data;
+}
+

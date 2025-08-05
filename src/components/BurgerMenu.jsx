@@ -1,5 +1,5 @@
 import { HiOutlineMenu } from "react-icons/hi";
-import { MdClose, MdEdit } from "react-icons/md";
+import { MdClose, MdEdit, MdDelete } from "react-icons/md";
 import { FiEdit, FiTrash2, FiSettings, FiHelpCircle } from "react-icons/fi";
 import { BiCategory } from "react-icons/bi";
 import { BsArchive } from "react-icons/bs";
@@ -10,20 +10,39 @@ import { useNotes } from "../context/NoteContext";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { FaSave, FaFolder } from "react-icons/fa";
-import useMediaQuery from "../hooks/useMediaQuery";
 
 const BurgerMenu = () => {
-  const { createCategory, getAllActiveCategories, updateCatgory, categories } = useNotes();
-
-  const isWindow = useMediaQuery("(1024px)")
+  const {
+    createCategory,
+    getAllActiveCategories,
+    updateCatgory,
+    categories,
+    deleteCategory,
+  } = useNotes();
 
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [id, setId] = useState(null);
+  const [confirmingDeleteCategory, setConfirmingDeleteCategory] = useState(null);
 
   const handleMenu = () => setIsOpen((prev) => !prev);
-  const handleCloseMenu = () => setIsOpen(false);
+  const handleCloseMenu = () => {
+    setIsOpen(false);
+    setConfirmingDeleteCategory(null);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      if (id) {
+        await deleteCategory(id);
+        // toast.success("Category deleted successfully");
+        await getAllActiveCategories();
+      }
+    } catch (error) {
+      toast.error("Failed to delete category");
+    }
+  };
 
   const handleCategory = async (name) => {
     if (!name.trim()) return toast.error("Category name is required");
@@ -39,10 +58,9 @@ const BurgerMenu = () => {
       setName("");
       setIsEditing(false);
       setId(null);
-      getAllActiveCategories();
+      await getAllActiveCategories();
     } catch (error) {
-      console.error("Failed to create category:", error);
-      toast.error("Failed to create category");
+      toast.error("Failed to create/update category");
     }
   };
 
@@ -59,11 +77,10 @@ const BurgerMenu = () => {
       />
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 bg-black bg-opacity-40 transition-opacity duration-300">
-          <div
-            className="w-[90%] lg:w-[30%] h-full bg-zinc-900 text-white px-4 py-4 shadow-lg transform transition-transform duration-300 translate-x-0 animate-slide-in"
+        <>
+          <div className="fixed inset-0 z-40 bg-black bg-opacity-40 transition-opacity duration-300" />
 
-          >
+          <div className="fixed top-0 left-0 w-[90%] lg:w-[30%] h-full bg-zinc-900 text-white px-4 py-4 shadow-lg z-50 animate-slide-in">
             <div className="flex justify-end">
               <button onClick={handleCloseMenu} className="text-3xl">
                 <MdClose />
@@ -86,7 +103,11 @@ const BurgerMenu = () => {
                       <h2 className="text-lg font-semibold text-white">Categories</h2>
                       <button
                         className="text-white hover:text-amber-400 transition-colors"
-                        onClick={() => setIsEditing(true)}
+                        onClick={() => {
+                          setIsEditing(true);
+                          setName("");
+                          setId(null);
+                        }}
                       >
                         <IoAddCircleOutline size={28} />
                       </button>
@@ -124,36 +145,46 @@ const BurgerMenu = () => {
                         </div>
                       ) : Array.isArray(categories) && categories.length > 0 ? (
                         <div className="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-1">
-                          {categories.map((cat) => (
-                            <div
-                              key={cat.id}
-                              className="bg-zinc-800 hover:bg-zinc-700 transition-colors text-white px-4 py-2 rounded shadow flex items-center gap-2 justify-between"
-                            >
-                              <Link
-                                to={`/note/category/${encodeURIComponent(cat.name)}`}
-                                onClick={handleCloseMenu}
-                                className="flex items-center gap-2 flex-1 overflow-hidden"
-                                title={`${cat.name} Folder`}
+                          {[...categories]
+                            .sort((a, b) => a.name.localeCompare(b.name))
+                            .map((cat) => (
+                              <div
+                                key={cat.id}
+                                className="bg-zinc-800 hover:bg-zinc-700 transition-colors text-white px-4 py-2 rounded shadow flex items-center gap-2 justify-between"
                               >
-                                <div className="w-5 flex-shrink-0">
-                                  <FaFolder className="text-lg text-amber-400" />
-                                </div>
-                                <span className="truncate">{cat.name}</span>
-                              </Link>
+                                <Link
+                                  to={`/note/category/${encodeURIComponent(cat.name)}`}
+                                  onClick={handleCloseMenu}
+                                  className="flex items-center gap-2 flex-1 overflow-hidden"
+                                  title={`${cat.name} Folder`}
+                                >
+                                  <div className="w-5 flex-shrink-0">
+                                    <FaFolder className="text-lg text-amber-400" />
+                                  </div>
+                                  <span className="truncate">{cat.name}</span>
+                                </Link>
 
-                              <button
-                                onClick={() => {
-                                  setIsEditing(true);
-                                  setName(cat.name);
-                                  setId(cat.id);
-                                }}
-                                className="hover:text-amber-400 ml-2"
-                                title="Edit category"
-                              >
-                                <MdEdit />
-                              </button>
-                            </div>
-                          ))}
+                                <button
+                                  onClick={() => {
+                                    setIsEditing(true);
+                                    setName(cat.name);
+                                    setId(cat.id);
+                                  }}
+                                  className="hover:text-amber-400 ml-2"
+                                  title="Edit category"
+                                >
+                                  <MdEdit />
+                                </button>
+
+                                <button
+                                  onClick={() => setConfirmingDeleteCategory(cat.id)}
+                                  className="cursor-pointer hover:text-red-400"
+                                  title="Delete category"
+                                >
+                                  <MdDelete />
+                                </button>
+                              </div>
+                            ))}
                         </div>
                       ) : (
                         <p className="text-sm text-gray-500">No categories found.</p>
@@ -176,7 +207,9 @@ const BurgerMenu = () => {
                     <FiTrash2 className="text-xl" />
                     <div className="flex justify-center items-center gap-2">
                       <span className="text-white">Bin</span>
-                      <span className="text-sm font-normal text-gray-400 leading-none">(deletes after 60 days)</span>
+                      <span className="text-sm font-normal text-gray-400 leading-none">
+                        (deletes after 60 days)
+                      </span>
                     </div>
                   </div>
                 </Link>
@@ -206,7 +239,38 @@ const BurgerMenu = () => {
               </div>
             </nav>
           </div>
-        </div>
+
+          {confirmingDeleteCategory && (
+            <div className="fixed inset-0 z-[70] flex justify-center items-center bg-black bg-opacity-60">
+              <div className="bg-white rounded-lg p-6 w-[90%] max-w-md text-center shadow-lg">
+                <h2 className="text-xl font-semibold mb-4 text-red-600">
+                  Confirm Deletion
+                </h2>
+                <p className="mb-6 text-gray-700">
+                  Are you sure you want to delete this category? This action cannot be undone.
+                  <p>(Notes of the category will not be deleted)</p>
+                </p>
+                <div className="flex justify-center gap-4">
+                  <button
+                    className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
+                    onClick={async () => {
+                      await handleDelete(confirmingDeleteCategory);
+                      setConfirmingDeleteCategory(null);
+                    }}
+                  >
+                    Yes, delete
+                  </button>
+                  <button
+                    className="px-4 py-2 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                    onClick={() => setConfirmingDeleteCategory(null)}
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </>
   );
