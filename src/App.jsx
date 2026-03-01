@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ArchivePage from "./pages/ArchivePage";
 import Bin from "./pages/Bin";
 import CategoryPage from "./pages/CategoryPage";
+import NotesDisplay from "./components/NotesDisplay";
 
 const Placeholder = () => (
   <div className="flex items-center justify-center h-full text-gray-500 bg-amber-200 min-h-screen">
@@ -21,9 +22,9 @@ const App = () => {
     <>
       <ToastContainer />
       <Routes>
+        <Route path="/" element={<Homepage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/" element={<Navigate to="/notes" />} />
 
         <Route
           path="/create"
@@ -38,7 +39,7 @@ const App = () => {
           path="/notes"
           element={
             <ProtectedRoute>
-              <Homepage />
+              <NotesDisplay />
             </ProtectedRoute>
           }
         >
@@ -56,17 +57,17 @@ const App = () => {
           }
         />
 
-<Route
-  path="/archive"
-  element={
-    <ProtectedRoute>
-      <ArchivePage />
-    </ProtectedRoute>
-  }
->
-  <Route index element={<Placeholder/>} />
-  <Route path="notes/:id" element={<NoteEditor />} />
-</Route>
+        <Route
+          path="/archive"
+          element={
+            <ProtectedRoute>
+              <ArchivePage />
+            </ProtectedRoute>
+          }
+        >
+          <Route index element={<Placeholder />} />
+          <Route path="notes/:id" element={<NoteEditor />} />
+        </Route>
 
         <Route
           path="/bin"

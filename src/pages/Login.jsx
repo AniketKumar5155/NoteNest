@@ -1,10 +1,18 @@
-import LoginForm from "./LoginForm"
+import LoginForm from "./LoginForm";
+import { Link } from "react-router-dom";
 const Login = () => {
   return (
-    <>
-      <LoginForm/>
-    </>
-  )
-}
+    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-amber-50 to-amber-100 px-4 py-10">
+      <div className="w-full max-w-md bg-white rounded-xl shadow-lg p-8">
+        <LoginForm />
+        <div className="mt-6 text-center">
+          <Link to="/" className="text-amber-600 hover:underline font-semibold text-sm">
+            ← Back to Homepage
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
 
-export default Login
+export default Login;
