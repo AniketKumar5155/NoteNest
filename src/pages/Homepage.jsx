@@ -72,7 +72,6 @@ const Homepage = () => {
             </div>
           </div>
 
-          {/* RIGHT (APP PREVIEW MOCK) */}
           <div className="bg-white rounded-md shadow-2xl border border-b-8 border-amber-50">
             <div className="overflow-hidden rounded-md">
               <img
@@ -85,7 +84,6 @@ const Homepage = () => {
 
         </section>
 
-        {/* FEATURES */}
         <section className="bg-white py-20 px-6">
           <div className="max-w-7xl mx-auto text-center mb-14">
             <h2 className="text-4xl font-extrabold text-gray-900">
@@ -116,7 +114,6 @@ const Homepage = () => {
           </div>
         </section>
 
-        {/* HOW IT WORKS */}
         <section className="py-20 px-6">
           <div className="max-w-6xl mx-auto text-center mb-16">
             <h2 className="text-4xl font-extrabold text-gray-900">How it works</h2>
@@ -135,27 +132,53 @@ const Homepage = () => {
           </div>
         </section>
 
-        {/* TESTIMONIALS */}
         <section className="bg-white py-20 px-6">
           <div className="max-w-6xl mx-auto text-center mb-14">
             <h2 className="text-4xl font-extrabold text-gray-900">
               Loved by productive people
             </h2>
+            <p className="text-gray-600 mt-2">
+              Here's what our users are saying about NoteNest
+            </p>
           </div>
 
           <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
 
-            {["Best notes app for my daily coding.", "Finally organized my study workflow.", "Fast, clean, and beautiful UI."].map((t, i) => (
-              <div key={i} className="bg-amber-50 p-6 rounded-xl shadow-sm">
-                <p className="text-gray-700 mb-4">“{t}”</p>
-                <p className="font-semibold text-gray-900">User #{i + 1}</p>
+            {[
+              {
+                text: "NoteNest completely changed the way I organize my projects. Everything is instantly searchable and categorized.",
+                name: "Samantha Lee",
+                role: "Product Manager",
+                avatar: "https://i.pravatar.cc/100?img=32",
+              },
+              {
+                text: "Finally a notes app that is fast, clean, and intuitive. My workflow has never been smoother!",
+                name: "David Chen",
+                role: "Software Developer",
+                avatar: "https://i.pravatar.cc/100?img=12",
+              },
+              {
+                text: "Perfect for students and creators. Helps me organize study notes and reference materials effortlessly.",
+                name: "Aisha Patel",
+                role: "Graduate Student",
+                avatar: "https://i.pravatar.cc/100?img=56",
+              },
+            ].map((t, i) => (
+              <div key={i} className="bg-amber-50 p-6 rounded-xl shadow-sm flex flex-col items-center text-center">
+                <img
+                  src={t.avatar}
+                  alt={t.name}
+                  className="w-16 h-16 rounded-full mb-4 object-cover border-2 border-amber-200"
+                />
+                <p className="text-gray-700 mb-4 text-sm">{`“${t.text}”`}</p>
+                <p className="font-semibold text-gray-900">{t.name}</p>
+                <p className="text-gray-500 text-xs">{t.role}</p>
               </div>
             ))}
 
           </div>
         </section>
 
-        {/* FINAL CTA */}
         <section className="py-20 text-center bg-gradient-to-r from-amber-500 to-amber-600 text-white">
           <h2 className="text-4xl font-extrabold mb-4">
             Ready to take control of your notes?
