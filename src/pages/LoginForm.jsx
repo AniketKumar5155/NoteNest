@@ -23,7 +23,7 @@ const LoginForm = () => {
       const validated = loginSchema.parse(formData);
       await login(validated);
       toast.success("Logged in successfully");
-      navigate("/", { replace: true });
+      navigate("/notes", { replace: true });
     } catch (err) {
       if (err.name === "ZodError") {
         err.errors.forEach((e) => toast.error(e.message));

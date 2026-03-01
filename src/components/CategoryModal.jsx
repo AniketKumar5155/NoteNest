@@ -1,6 +1,6 @@
 import { toast } from "react-toastify";
 import { useNotes } from "../context/NoteContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaAngleDown } from "react-icons/fa";
 
 const CategoryModal = ({ onClose, noteId }) => {
@@ -8,9 +8,13 @@ const CategoryModal = ({ onClose, noteId }) => {
     const [selectedCategory, setSelectedCategory] = useState("");
     const [isOpen, setIsOpen] = useState(false);
 
+    
+    
+    
     const toggleDropdown = () => setIsOpen((prev) => !prev);
-
+    
     const handleSelect = async (category) => {
+        console.log(`categories: ${categories}`)
         setSelectedCategory(category);
         setIsOpen(false);
 
@@ -66,6 +70,7 @@ const CategoryModal = ({ onClose, noteId }) => {
                                     >
                                         {cat.name}
                                     </div>
+                                    
                                 ))}
                             </div>
                         )}

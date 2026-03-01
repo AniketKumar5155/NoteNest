@@ -7,6 +7,7 @@ import { HiOutlineShieldCheck } from "react-icons/hi";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useNotes } from "../context/NoteContext";
+import { useAuth } from "../context/AuthContext";
 import { IoAddCircleOutline } from "react-icons/io5";
 import { toast } from "react-toastify";
 import { FaSave, FaFolder } from "react-icons/fa";
@@ -20,13 +21,14 @@ const BurgerMenu = () => {
     deleteCategory,
   } = useNotes();
 
+  const { auth } = useAuth();
+
   const [isOpen, setIsOpen] = useState(false);
   const [name, setName] = useState("");
   const [isEditing, setIsEditing] = useState(false);
   const [id, setId] = useState(null);
   const [confirmingDeleteCategory, setConfirmingDeleteCategory] = useState(null);
 
-  const handleMenu = () => setIsOpen((prev) => !prev);
   const handleCloseMenu = () => {
     setIsOpen(false);
     setConfirmingDeleteCategory(null);
@@ -36,7 +38,6 @@ const BurgerMenu = () => {
     try {
       if (id) {
         await deleteCategory(id);
-        // toast.success("Category deleted successfully");
         await getAllActiveCategories();
       }
     } catch (error) {
@@ -64,9 +65,17 @@ const BurgerMenu = () => {
     }
   };
 
-  useEffect(() => {
-    getAllActiveCategories();
-  }, []);
+  const handleMenu = async () => {
+  setIsOpen((prev) => {
+    const next = !prev;
+
+    if (next && auth?.user && (!categories || categories.length === 0)) {
+      getAllActiveCategories();
+    }
+
+    return next;
+  });
+};
 
   return (
     <>
@@ -86,157 +95,167 @@ const BurgerMenu = () => {
                 <MdClose />
               </button>
             </div>
-
             <nav className="flex flex-col gap-6 h-full">
-              <Link to="/" onClick={handleCloseMenu}>
-                <div className="flex items-center gap-3 text-lg font-semibold border-b border-zinc-700 pb-2">
-                  <FiEdit />
-                  <span>Notes</span>
-                </div>
-              </Link>
 
-              <div className="border-b border-zinc-700 pb-2">
-                <div className="flex items-start gap-3 text-lg font-semibold mb-1">
-                  <BiCategory className="mt-1" />
-                  <div className="flex flex-col w-full gap-3">
-                    <div className="flex items-center justify-between">
-                      <h2 className="text-lg font-semibold text-white">Categories</h2>
-                      <button
-                        className="text-white hover:text-amber-400 transition-colors"
-                        onClick={() => {
-                          setIsEditing(true);
-                          setName("");
-                          setId(null);
-                        }}
-                      >
-                        <IoAddCircleOutline size={28} />
-                      </button>
+              {!auth?.user ? (
+                <Link to="/login" onClick={handleCloseMenu}>
+                  <div className="flex items-center gap-3 text-lg font-semibold border-b border-zinc-700 pb-2">
+                    <FiEdit />
+                    <span>Login</span>
+                  </div>
+                </Link>
+              ) : (
+                <>
+                  <Link to="/" onClick={handleCloseMenu}>
+                    <div className="flex items-center gap-3 text-lg font-semibold border-b border-zinc-700 pb-2">
+                      <FiEdit />
+                      <span>Notes</span>
                     </div>
+                  </Link>
 
-                    <div>
-                      {isEditing ? (
-                        <div className="flex justify-between items-center gap-4">
-                          <input
-                            type="text"
-                            name="categoryName"
-                            className="w-full h-8 px-2 rounded bg-zinc-800 text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
-                            placeholder="Enter category"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") handleCategory(name);
-                            }}
-                          />
-                          <p
+                  <div className="border-b border-zinc-700 pb-2">
+                    <div className="flex items-start gap-3 text-lg font-semibold mb-1">
+                      <BiCategory className="mt-1" />
+                      <div className="flex flex-col w-full gap-3">
+                        <div className="flex items-center justify-between">
+                          <h2 className="text-lg font-semibold text-white">Categories</h2>
+                          <button
+                            className="text-white hover:text-amber-400 transition-colors"
                             onClick={() => {
-                              setIsEditing(false);
+                              setIsEditing(true);
                               setName("");
                               setId(null);
                             }}
-                            className="text-sm text-red-400 cursor-pointer"
                           >
-                            Cancel
-                          </p>
-                          <FaSave
-                            size={24}
-                            className="text-white hover:text-amber-400 cursor-pointer"
-                            onClick={() => handleCategory(name)}
-                          />
+                            <IoAddCircleOutline size={28} />
+                          </button>
                         </div>
-                      ) : Array.isArray(categories) && categories.length > 0 ? (
-                        <div className="flex flex-col gap-2 max-h-[250px] overflow-y-auto pr-1">
-                          {[...categories]
-                            .sort((a, b) => a.name.localeCompare(b.name))
-                            .map((cat) => (
-                              <div
-                                key={cat.id}
-                                className="bg-zinc-800 hover:bg-zinc-700 transition-colors text-white px-4 py-2 rounded shadow flex items-center gap-2 justify-between"
+
+                        <div>
+                          {isEditing ? (
+                            <div className="flex justify-between items-center gap-4">
+                              <input
+                                type="text"
+                                name="categoryName"
+                                className="w-full h-8 px-2 rounded bg-zinc-800 text-white placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                                placeholder="Enter category"
+                                value={name}
+                                onChange={(e) => setName(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") handleCategory(name);
+                                }}
+                              />
+                              <p
+                                onClick={() => {
+                                  setIsEditing(false);
+                                  setName("");
+                                  setId(null);
+                                }}
+                                className="text-sm text-red-400 cursor-pointer"
                               >
-                                <Link
-                                  to={`/note/category/${encodeURIComponent(cat.name)}`}
-                                  onClick={handleCloseMenu}
-                                  className="flex items-center gap-2 flex-1 overflow-hidden"
-                                  title={`${cat.name} Folder`}
-                                >
-                                  <div className="w-5 flex-shrink-0">
-                                    <FaFolder className="text-lg text-amber-400" />
+                                Cancel
+                              </p>
+                              <FaSave
+                                size={24}
+                                className="text-white hover:text-amber-400 cursor-pointer"
+                                onClick={() => handleCategory(name)}
+                              />
+                            </div>
+                          ) : Array.isArray(categories) && categories.length > 0 ? (
+                            <div className="flex flex-col gap-2 pr-1 max-h-[250px] overflow-y-auto">
+                              {[...categories]
+                                .sort((a, b) => a.name.localeCompare(b.name))
+                                .map((cat) => (
+                                  <div
+                                    key={cat.id}
+                                    className="bg-zinc-800 hover:bg-zinc-700 transition-colors text-white px-4 py-2 rounded shadow flex items-center gap-2 justify-between"
+                                  >
+                                    <Link
+                                      to={`/note/category/${encodeURIComponent(cat.name)}`}
+                                      onClick={handleCloseMenu}
+                                      className="flex items-center gap-2 flex-1 overflow-hidden"
+                                      title={`${cat.name} Folder`}
+                                    >
+                                      <div className="w-5 flex-shrink-0">
+                                        <FaFolder className="text-lg text-amber-400" />
+                                      </div>
+                                      <span className="truncate">{cat.name}</span>
+                                    </Link>
+
+                                    <button
+                                      onClick={() => {
+                                        setIsEditing(true);
+                                        setName(cat.name);
+                                        setId(cat.id);
+                                      }}
+                                      className="hover:text-amber-400 ml-2"
+                                    >
+                                      <MdEdit />
+                                    </button>
+
+                                    <button
+                                      onClick={() => setConfirmingDeleteCategory(cat.id)}
+                                      className="cursor-pointer hover:text-red-400"
+                                    >
+                                      <MdDelete />
+                                    </button>
                                   </div>
-                                  <span className="truncate">{cat.name}</span>
-                                </Link>
-
-                                <button
-                                  onClick={() => {
-                                    setIsEditing(true);
-                                    setName(cat.name);
-                                    setId(cat.id);
-                                  }}
-                                  className="hover:text-amber-400 ml-2"
-                                  title="Edit category"
-                                >
-                                  <MdEdit />
-                                </button>
-
-                                <button
-                                  onClick={() => setConfirmingDeleteCategory(cat.id)}
-                                  className="cursor-pointer hover:text-red-400"
-                                  title="Delete category"
-                                >
-                                  <MdDelete />
-                                </button>
-                              </div>
-                            ))}
+                                ))}
+                            </div>
+                          ) : (
+                            <p className="text-sm text-gray-500">No categories found.</p>
+                          )}
                         </div>
-                      ) : (
-                        <p className="text-sm text-gray-500">No categories found.</p>
-                      )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
 
-              <div className="border-b border-zinc-700 pb-2 flex flex-col gap-3">
-                <Link to="/archive" onClick={handleCloseMenu}>
-                  <div className="flex items-center gap-3 text-lg font-semibold">
-                    <BsArchive />
-                    <span>Archive</span>
-                  </div>
-                </Link>
+                  <div className="border-b border-zinc-700 pb-2 flex flex-col gap-3">
+                    <Link to="/archive" onClick={handleCloseMenu}>
+                      <div className="flex items-center gap-3 text-lg font-semibold">
+                        <BsArchive />
+                        <span>Archive</span>
+                      </div>
+                    </Link>
 
-                <Link to="/bin" onClick={handleCloseMenu}>
-                  <div className="flex items-center gap-3 text-lg font-semibold">
-                    <FiTrash2 className="text-xl" />
-                    <div className="flex justify-center items-center gap-2">
-                      <span className="text-white">Bin</span>
-                      <span className="text-sm font-normal text-gray-400 leading-none">
-                        (deletes after 60 days)
-                      </span>
-                    </div>
+                    <Link to="/bin" onClick={handleCloseMenu}>
+                      <div className="flex items-center gap-3 text-lg font-semibold">
+                        <FiTrash2 className="text-xl" />
+                        <div className="flex justify-center items-center gap-2">
+                          <span className="text-white">Bin</span>
+                          <span className="text-sm font-normal text-gray-400 leading-none">
+                            (deletes after 60 days)
+                          </span>
+                        </div>
+                      </div>
+                    </Link>
                   </div>
-                </Link>
-              </div>
 
-              <div className="flex flex-col gap-3 text-lg font-semibold">
-                <Link to="/settings" onClick={handleCloseMenu}>
-                  <div className="flex items-center gap-3">
-                    <FiSettings />
-                    <span>Settings</span>
-                  </div>
-                </Link>
+                  <div className="flex flex-col gap-3 text-lg font-semibold">
+                    <Link to="/settings" onClick={handleCloseMenu}>
+                      <div className="flex items-center gap-3">
+                        <FiSettings />
+                        <span>Settings</span>
+                      </div>
+                    </Link>
 
-                <Link to="/help" onClick={handleCloseMenu}>
-                  <div className="flex items-center gap-3">
-                    <FiHelpCircle />
-                    <span>Help</span>
-                  </div>
-                </Link>
+                    <Link to="/help" onClick={handleCloseMenu}>
+                      <div className="flex items-center gap-3">
+                        <FiHelpCircle />
+                        <span>Help</span>
+                      </div>
+                    </Link>
 
-                <Link to="/privacy-policy" onClick={handleCloseMenu}>
-                  <div className="flex items-center gap-3">
-                    <HiOutlineShieldCheck />
-                    <span>Privacy Policy</span>
+                    <Link to="/privacy-policy" onClick={handleCloseMenu}>
+                      <div className="flex items-center gap-3">
+                        <HiOutlineShieldCheck />
+                        <span>Privacy Policy</span>
+                      </div>
+                    </Link>
                   </div>
-                </Link>
-              </div>
+                </>
+              )}
+
             </nav>
           </div>
 
@@ -248,7 +267,6 @@ const BurgerMenu = () => {
                 </h2>
                 <p className="mb-6 text-gray-700">
                   Are you sure you want to delete this category? This action cannot be undone.
-                  <p>(Notes of the category will not be deleted)</p>
                 </p>
                 <div className="flex justify-center gap-4">
                   <button

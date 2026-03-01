@@ -212,6 +212,7 @@ export const NoteProvider = ({ children }) => {
     try {
       const data = await getAllActiveCategoriesService();
       setCategories(data);
+      return data;
     } catch (error) {
       toast.error("Failed to fetch categories");
     }
